@@ -5,7 +5,7 @@ page_deep_scraper:
 model_builder:
 
 
-utils:
+utils
 - requestHTTP.py: link -> html
 - html_spliter: html -> content_dictionary
 - urls_extractor: str -> url
@@ -13,8 +13,7 @@ utils:
 - urls_format: url -> url_limpio
 - text_extractor: str -> str_info_relevante
 
-- data filter:
-is_in_root_domain(url, url) -> Bool
+- data filter: list of links -> list of lists of links
 
 
 DEPENDENCIAS:
