@@ -32,8 +32,11 @@ _ANALYTICS_DOMAIN_HINTS = [
     "framer.com",
     "framer.app",
     "fonts.gstatic.com",
+    "fonts.googleapis.com",
+    "intercom.com",
+    "particlecollection.com",
+    "intercomcdn.com"
 ]
-
 _ASSET_PATH_HINTS = [
     "/wp-content/",
     "/static/",
