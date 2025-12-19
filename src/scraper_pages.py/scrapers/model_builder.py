@@ -156,6 +156,8 @@ async def from_url_model(url=None, name=None, slug=None, primary_domain=None):
     identity = data_to_identity(url=url, name=name, slug=slug, primary_domain=primary_domain)
     print(identity)
 
+
+    
     dataSources = await page_deep_scraped_to_dataSources(page_deep_scraper(url))
 
 

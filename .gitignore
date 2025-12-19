@@ -1,3 +1,19 @@
-__pycache__
+# Entorno virtual
+venv/
+.env/
+.env.example
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
 
-.venv/
+# VS Code
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+

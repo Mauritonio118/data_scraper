@@ -1,3 +1,8 @@
+Scraper(internet -> Data -> Modelo base)
+DB(Lectura y escritura de bases de datos)
+analizers(Modelo base -> Analisis -> Modelo Depurado)
+
+
 page_deep_scraper:
 - page_scraper: url -> (links, text)_dictionary
 - 
@@ -17,14 +22,23 @@ utils
 
 
 DEPENDENCIAS:
+pip install notebook
 pip install httpx
-pip install playwright
-playwright install
 pip install httpx[http2]
 pip install brotli
 pip install BeautifulSoup4
 pip install lxml
+pip install tldextract
+pip install playwright
+playwright install          #No olvidar
 
 
-ACTIVAR ENTORNO:
-cmd-> venv\Scripts\activate 
+ENTORNO PYTHON:
+Crear: cmd -> python -m venv venv
+Activar: cmd-> venv\Scripts\activate
+Instalar dependencias: cmd -> python -m pip install --upgrade pip
+                           -> pip install -r requirements.txt
+                           -> playwright install
+Desactivar: cmd -> deactivate
+
+
