@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from page_deep_scraper import page_scraper, page_deep_scraper
+from scrapers.page_deep_scraper import page_scraper, page_deep_scraper
 import tldextract
 
 #Agrega a la lista solo si el valor no se encuentra ya en la lista
@@ -154,18 +154,17 @@ def data_to_identity(url=None, name=None, slug=None, primary_domain=None):
 async def from_url_model(url=None, name=None, slug=None, primary_domain=None):
   
     identity = data_to_identity(url=url, name=name, slug=slug, primary_domain=primary_domain)
-    print(identity)
 
 
     deep_scraped_page = await page_deep_scraper(url)
     dataSources = await page_deep_scraped_to_dataSources(deep_scraped_page)
 
 
-    model = [{
+    model = {
     "slug": identity["slug"],
     "name": identity["name"],
     "primaryDomain": identity["primaryDomain"],
     "dataSources": dataSources
-    }]
+    }
 
     return model

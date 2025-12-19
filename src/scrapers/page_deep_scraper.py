@@ -1,18 +1,18 @@
 from urllib.parse import urlparse
 
 #Import lectura HTML
-from utils.requestHTTP import fetch_html
+from scrapers.utils.requestHTTP import fetch_html
 
 #import manejo de html
-from utils.html_spliter_head_header_main_footer import html_spliter_head_header_main_footer
+from scrapers.utils.html_spliter_head_header_main_footer import html_spliter_head_header_main_footer
 
 #Import manejo de urls desde el HTML
-from utils.urls_extractor_from_html import urls_extractor_from_html  
-from utils.urls_utilities_cleaner import urls_utilities_cleaner
-from utils.urls_format_from_domain import urls_format_from_domain
+from scrapers.utils.urls_extractor_from_html import urls_extractor_from_html  
+from scrapers.utils.urls_utilities_cleaner import urls_utilities_cleaner
+from scrapers.utils.urls_format_from_domain import urls_format_from_domain
 
 #import manejo de textos desde el html
-from utils.text_extractor_from_html import text_extractor_from_html
+from scrapers.utils.text_extractor_from_html import text_extractor_from_html
 
 
 def url_processor_from_html(html, url_base):
@@ -132,9 +132,7 @@ async def page_deep_scraper(url_base: str, max_pages: int = 100):
         except Exception as e:
             pages[current] = {
                 "page": current,
-                "error": str(e),
-                "links": {"head": [], "header": [], "main": [], "footer": []},
-                "texts": {"head": [], "header": [], "main": [], "footer": []},
+                "error": {"type": type(e).__name__, "message": str(e)},
             }
             continue
 

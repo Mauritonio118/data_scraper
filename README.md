@@ -17,7 +17,6 @@ utils
 - urls_utilities_cleaner: urls -> urls_utiles (reduce list)
 - urls_format: url -> url_limpio
 - text_extractor: str -> str_info_relevante
-
 - data filter: list of links -> list of lists of links
 
 
