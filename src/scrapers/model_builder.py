@@ -157,8 +157,8 @@ async def from_url_model(url=None, name=None, slug=None, primary_domain=None):
     print(identity)
 
 
-    
-    dataSources = await page_deep_scraped_to_dataSources(page_deep_scraper(url))
+    deep_scraped_page = await page_deep_scraper(url)
+    dataSources = await page_deep_scraped_to_dataSources(deep_scraped_page)
 
 
     model = [{
