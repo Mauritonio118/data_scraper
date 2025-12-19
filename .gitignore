@@ -1,7 +1,7 @@
 # Entorno virtual
 venv/
 .env/
-.env.example
+envData/
 # Archivos de Python
 __pycache__/
 *.pyc

@@ -34,8 +34,8 @@ playwright install          #No olvidar
 
 
 ENTORNO PYTHON:
-Crear: cmd -> python -m venv venv
-Activar: cmd-> venv\Scripts\activate
+Crear: cmd -> python -m venv envData
+Activar: cmd-> envData\Scripts\activate
 Instalar dependencias: cmd -> python -m pip install --upgrade pip
                            -> pip install -r requirements.txt
                            -> playwright install
