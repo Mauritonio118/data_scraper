@@ -1,18 +1,18 @@
 from urllib.parse import urlparse
 
 #Import lectura HTML
-from scrapers.utils.requestHTTP import fetch_html
+from src.scrapers.utils.requestHTTP import fetch_html
 
 #import manejo de html
-from scrapers.utils.html_spliter_head_header_main_footer import html_spliter_head_header_main_footer
+from src.scrapers.utils.html_spliter_head_header_main_footer import html_spliter_head_header_main_footer
 
 #Import manejo de urls desde el HTML
-from scrapers.utils.urls_extractor_from_html import urls_extractor_from_html  
-from scrapers.utils.urls_utilities_cleaner import urls_utilities_cleaner
-from scrapers.utils.urls_format_from_domain import urls_format_from_domain
+from src.scrapers.utils.urls_extractor_from_html import urls_extractor_from_html  
+from src.scrapers.utils.urls_utilities_cleaner import urls_utilities_cleaner
+from src.scrapers.utils.urls_format_from_domain import urls_format_from_domain
 
 #import manejo de textos desde el html
-from scrapers.utils.text_extractor_from_html import text_extractor_from_html
+from src.scrapers.utils.text_extractor_from_html import text_extractor_from_html
 
 
 def url_processor_from_html(html, url_base):

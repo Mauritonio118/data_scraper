@@ -13,6 +13,11 @@ from typing import Optional
 from pymongo import MongoClient
 from pymongo.database import Database
 
+from pathlib import Path
+from dotenv import load_dotenv
+
+#Habilitar a python para usar las variables de entorno
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 # Config simple para Mongo
 @dataclass(frozen=True)

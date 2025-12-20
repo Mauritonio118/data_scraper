@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from scrapers.page_deep_scraper import page_scraper, page_deep_scraper
+from src.scrapers.page_deep_scraper import page_scraper, page_deep_scraper
 import tldextract
 
 #Agrega a la lista solo si el valor no se encuentra ya en la lista

@@ -1,16 +1,19 @@
 import pandas as pd
 import csv
 import asyncio
-from DB.mongo import get_db
-from scrapers.model_builder import from_url_model
+from src.DB.mongo import get_db
+from src.scrapers.model_builder import from_url_model
+from pathlib import Path
+from datetime import datetime
 
 #Coneccion MongoDB
 db = get_db()
 companiesDB = db["companies"]
 
 #PATH de datos
-INPUT_PATH = "companies_list.csv"
-OUTPUT_PATH = "companies_list_out.csv"
+HERE = Path(__file__).resolve().parent
+INPUT_PATH = HERE / "companies_list.csv"
+OUTPUT_PATH = HERE / "companies_list_out.csv"
 #Lecrura de datos entrada
 df = pd.read_csv(INPUT_PATH)
 
@@ -33,6 +36,7 @@ async def main():
             #Extraccion datos base
             primary_domain = row.Page
             name = row.Nombre
+            print("ID: " + str(row.ID) + "  Companie: "+ name + "  Page: " + primary_domain)
             
             #Intentar scrapeo
             try:
@@ -43,10 +47,12 @@ async def main():
 
                     #Escrapeo profundo
                     #from_url_model(url=None, name=None, slug=None, primary_domain=None)
+                    print("Sraping start: " + datetime.now().strftime("%H:%M:%S.%f") + "  url: " + url)
                     model = await from_url_model(url=url, name=name, primary_domain=primary_domain)
                     
                     #Guardar modelo en DB
                     companiesDB.insert_one(model)
+                    print("Model in Mongo")
 
                     #Ajuste del output
                     out_row["Slug"] = model["slug"]
@@ -62,10 +68,12 @@ async def main():
                     url = "https://" + primary_domain
 
                     #Escrapeo profundo
+                    print("Sraping start: " + datetime.now().strftime("%H:%M:%S.%f") + "  url: " + url)
                     model = await from_url_model(url=url, primary_domain=primary_domain)
 
                     #Guardar modelo en DB
                     companiesDB.insert_one(model)
+                    print("Model in Mongo")
 
                     #Ajuste del output
                     out_row["Slug"] = model["slug"]
@@ -74,13 +82,22 @@ async def main():
                     #Guardado del output
                     writer.writerow(out_row)
                     f.flush()  # fuerza guardado inmediato en disco
+
                 
                 else:
+                    print("No hay url")
+
                     #Ajuste del output
                     out_row["In_mongo"] = "NO. Sin url."
 
+                    #Guardado del output
+                    writer.writerow(out_row)
+                    f.flush()  # fuerza guardado inmediato en disco                    
+
             #Abordar error
             except Exception as e:
+
+                print("ERROR  Tipo: " + str(type(e)) + "  Mensaje: " + str(e))
 
                 #Ajuste del output.
                 out_row["In_mongo"] = "NO, excepción. Tipo: " + str(type(e)) + ". Mensaje: " + str(e)
@@ -88,6 +105,11 @@ async def main():
                 #Guardado del output
                 writer.writerow(out_row)
                 f.flush()  # fuerza guardado inmediato en disco
+            
+            finally:
+                print("")
+                print("-----------------------------------------------")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -8,3 +8,4 @@ tldextract
 playwright
 pymongo
 pandas
+python-dotenv
