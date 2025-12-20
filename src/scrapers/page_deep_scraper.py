@@ -132,6 +132,8 @@ async def page_deep_scraper(url_base: str, max_pages: int = 100):
         except Exception as e:
             pages[current] = {
                 "page": current,
+                "links": {},
+                "texts": {},
                 "error": {"type": type(e).__name__, "message": str(e)},
             }
             continue
@@ -181,8 +183,8 @@ def all_links_in_deep_scraped_page(deep_scraped):
     
     all_links_in_deep_scraped_page = []
     for url in scraped_urls_list:
-
-        for link_list in deep_scraped["pages"][url]["links"].values():
+        links = deep_scraped["pages"][url].get("links", {})
+        for link_list in links.values():
             largo = largo + len(link_list)
 
             for link in link_list:

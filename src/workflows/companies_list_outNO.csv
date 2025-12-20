@@ -15,3 +15,23 @@ ID,Nombre,Page,Slug,In_mongo
 14,HNW Lending,wmaff.com/click,wmaff,SI
 15,Mintos,mintos.com,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
 16,Letsinvest,letsinvest.eu,letsinvest,SI
+17,RE-LENDER,,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+18,Brickstarter,brickstarter.com,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+19,Recrowd,,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+20,Trusters,trusters.it,trusters,SI
+21,PeerBerry,peerberry.com,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+22,Rendity,rendity.com,rendity,SI
+23,Lemox,,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+24,SmartCrowd,smartcrowd.ae,smartcrowd,SI
+25,,zmartup.com,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+26,Blend Network,blendnetwork.com,blendnetwork,SI
+27,Concrete Investing,concreteinvesting.com,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+28,Fintown,fintown.eu,fintown,SI
+29,crowdpear,crowdpear.com,crowdpear,SI
+30,BERGFÃœRST,,,SI
+31,EstateGuru,estateguru.co,estateguru,SI
+32,Landed.eu,landed.eu,landed,SI
+33,Crowdfolio,,,SI
+34,Investown,investown.cz,investown,SI
+35,PRYPCO Blocks,prypco.com,prypco,SI
+36,Shojin,shojin.co.uk,shojin,SI
