@@ -7,3 +7,11 @@ ID,Nombre,Page,Slug,In_mongo
 6,Loping,loping.com,loping,SI
 7,Prypco,prypco.com,prypco,SI
 8,Binaryx,binaryx.com,binaryx,SI
+9,Equisafe,equisafe.io,equisafe,SI
+10,Equito,equito.app,equito,SI
+11,TWINO,twino.eu,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+12,Profitus,profitus.com,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+13,Equity Multiple,equitymultiple.com,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+14,HNW Lending,wmaff.com/click,wmaff,SI
+15,Mintos,mintos.com,,"NO, excepción. Tipo: <class 'KeyError'>. Mensaje: 'links'"
+16,Letsinvest,letsinvest.eu,letsinvest,SI

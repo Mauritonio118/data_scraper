@@ -1,3 +1,5 @@
+#CORRER CODIGO: python -m src.workflows.list_to_scrap_to_model_to_DB
+
 import pandas as pd
 import csv
 import asyncio
@@ -15,7 +17,7 @@ HERE = Path(__file__).resolve().parent
 INPUT_PATH = HERE / "companies_list.csv"
 OUTPUT_PATH = HERE / "companies_list_out.csv"
 #Lecrura de datos entrada
-df = pd.read_csv(INPUT_PATH)
+df = pd.read_csv(INPUT_PATH, dtype=str, keep_default_na=False)
 
 
 #Estructura salida
