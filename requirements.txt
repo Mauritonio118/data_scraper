@@ -6,3 +6,4 @@ BeautifulSoup4
 lxml
 tldextract
 playwright
+pymongo

@@ -1,7 +1,9 @@
 # Entorno virtual
 venv/
 .env/
+.env
 envData/
+
 # Archivos de Python
 __pycache__/
 *.pyc
