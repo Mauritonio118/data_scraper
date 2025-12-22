@@ -1,0 +1,44 @@
+DB/
+  __init__.py
+
+  config/
+    __init__.py
+    settings.py            # lee .env y expone Settings tipado
+    profiles.py            # mapea "dev" "prod" "test" -> config de DB
+
+  common/
+    __init__.py
+    exceptions.py          # errores propios de DB
+    logging.py             # logger común para queries y latencia
+    utils.py               # helpers genéricos (serialización, ObjectId, etc.)
+
+  mongo/
+    __init__.py
+    client.py              # factory de MongoClient + cache + cierre
+    health.py              # ping, server_info, readiness
+    indexes.py             # ensure_indexes por colección
+    collections.py         # nombres de colecciones centralizados
+    repositories/
+      __init__.py
+      base.py              # CRUD base y helpers (find_one, upsert, etc.)
+      companies.py         # lógica de dominio para companies
+      projects.py          # lógica de dominio para projects
+
+  sql/
+    __init__.py
+    engine.py              # crear Engine/Session (SQLAlchemy)
+    health.py              # select 1, connectivity
+    migrations.py          # hook para Alembic o runner
+    models.py              # ORM models
+    repositories/
+      __init__.py
+      base.py
+      companies.py         # si aplica también en SQL
+
+  scripts/
+    seed.py                # carga de datos
+    cleanup.py             # tareas puntuales
+
+tests/
+  test_db_mongo.py
+  test_db_sql.py

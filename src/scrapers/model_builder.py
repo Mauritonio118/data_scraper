@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from page_deep_scraper import page_scraper, page_deep_scraper
+from src.scrapers.page_deep_scraper import page_scraper, page_deep_scraper
 import tldextract
 
 #Agrega a la lista solo si el valor no se encuentra ya en la lista
@@ -18,8 +18,8 @@ def all_links_in_deep_scraped_page(deep_scraped):
     
     all_links_in_deep_scraped_page = []
     for url in scraped_urls_list:
-
-        for link_list in deep_scraped["pages"][url]["links"].values():
+        links = deep_scraped["pages"][url].get("links", {})
+        for link_list in links.values():
 
             for link in link_list:
                 append_unique(all_links_in_deep_scraped_page, link)
@@ -46,8 +46,8 @@ async def page_deep_scraped_to_dataSources(page_deep_scraped):
     for page_url in list_pages_scraped:
         dataSources.append({
             "url": page_url,
-            "links": page_deep_scraped["pages"][page_url]["links"],
-            "texts": page_deep_scraped["pages"][page_url]["texts"],
+            "links": page_deep_scraped["pages"][page_url].get("links", {}),
+            "texts": page_deep_scraped["pages"][page_url].get("texts", {}),
         })
 
     #Agrega a dataSources paginas que faltan por scrapear
@@ -154,16 +154,17 @@ def data_to_identity(url=None, name=None, slug=None, primary_domain=None):
 async def from_url_model(url=None, name=None, slug=None, primary_domain=None):
   
     identity = data_to_identity(url=url, name=name, slug=slug, primary_domain=primary_domain)
-    print(identity)
-
-    dataSources = await page_deep_scraped_to_dataSources(page_deep_scraper(url))
 
 
-    model = [{
+    deep_scraped_page = await page_deep_scraper(url)
+    dataSources = await page_deep_scraped_to_dataSources(deep_scraped_page)
+
+
+    model = {
     "slug": identity["slug"],
     "name": identity["name"],
     "primaryDomain": identity["primaryDomain"],
     "dataSources": dataSources
-    }]
+    }
 
     return model

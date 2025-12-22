@@ -1,7 +1,7 @@
 import asyncio
-from page_deep_scraper import page_deep_scraper
-from model_builder import page_deep_scraped_to_model
-import utils.data_filter as filter
+from scrapers.page_deep_scraper import page_deep_scraper
+from scrapers.model_builder import page_deep_scraped_to_model
+import data_filter as filter
 
 async def main():
     root_links = set()

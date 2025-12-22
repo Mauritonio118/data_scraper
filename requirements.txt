@@ -1,0 +1,11 @@
+notebook
+httpx
+httpx[http2]
+brotli
+BeautifulSoup4
+lxml
+tldextract
+playwright
+pymongo
+pandas
+python-dotenv
