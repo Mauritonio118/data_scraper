@@ -2,11 +2,9 @@ from mongo import get_db
 from typing import List, Dict, Any, Optional
 from urllib.parse import urlparse
 
-
 #Conectar con "companies" dentro de las colecciones de la DB
 db = get_db()
 companies = db["companies"]
-
 
 ######
 #SLUG#
@@ -46,7 +44,6 @@ def get_all_slugs(companies, include_empty: bool = False) -> List[str]:
 
     return slugs
 
-
 def get_unique_slugs(companies, include_empty: bool = False) -> List[str]:
     """
     Retorna todos los slugs unicos usando distinct.
@@ -78,7 +75,6 @@ def get_unique_slugs(companies, include_empty: bool = False) -> List[str]:
                     out.append(s2)
 
     return out
-
 
 def get_repeated_slugs(companies, include_empty: bool = False) -> List[Dict[str, Any]]:
 
@@ -126,6 +122,7 @@ def get_repeated_slugs(companies, include_empty: bool = False) -> List[Dict[str,
 
     return out
 
+
 #################
 #PRIMARY DOMAINS#
 #################
@@ -155,7 +152,6 @@ def get_all_primary_domains(companies, include_empty: bool = False) -> List[str]
 
     return out
 
-
 def get_unique_primary_domains(companies, include_empty: bool = False) -> List[str]:
     """
     Retorna primaryDomain unicos usando distinct.
@@ -177,7 +173,6 @@ def get_unique_primary_domains(companies, include_empty: bool = False) -> List[s
                     out.append(v2)
 
     return out
-
 
 def get_repeated_primary_domains(companies, include_empty: bool = False) -> List[Dict[str, Any]]:
     """
@@ -212,11 +207,12 @@ def get_repeated_primary_domains(companies, include_empty: bool = False) -> List
     return out
 
 
+##############
+#DATA SOURCES#
+##############
 
-######
-#URLS#
-######
 
+#URLS
 def get_unique_datasource_urls(companies, slug: str) -> list[str]:
     """
     Trae todas las urls dentro de dataSources.url para una company identificada por slug.
@@ -314,10 +310,7 @@ def unique_company_urls_from_primary_domain(companies, slug: str, mode: str = "l
     return sorted(unique)
 
 
-#######
-#LINKS#
-#######
-
+#LINKS
 def get_links_from_company_datasource(companies, slug: str, datasource_url: str, sections=None) -> list[str]:
     """
     Trae todos los links de un dataSource especifico dentro de una company.
@@ -357,10 +350,8 @@ def get_links_from_company_datasource(companies, slug: str, datasource_url: str,
 
     return _unique_preserve_order(collected)
 
-#######
-#TEXTS#
-#######
 
+#TEXTS
 def get_texts_from_company_datasource(companies, slug: str, datasource_url: str, sections=None, dedupe: bool = True) -> list[str]:
     """
     Trae todos los textos de un dataSource especifico dentro de una company.
@@ -410,6 +401,142 @@ def get_texts_from_company_datasource(companies, slug: str, datasource_url: str,
             if t2:
                 out.append(t2)
     return out
+
+
+#ROLE
+def datasource_role(companies, slug: str, datasource_url: str, action: str = "get", role: str | None = None):
+    """
+    Gestiona el campo dataSources.role para una url dentro de dataSources.
+
+    action soportado
+    - "get": lee el role actual
+    - "set": setea role al valor entregado
+    - "update": alias de set
+    - "delete": elimina el campo role usando unset
+
+    Input
+    - companies: colección PyMongo
+    - slug: slug de la company
+    - datasource_url: valor exacto en dataSources.url
+    - action: string con la operacion
+    - role: string requerido en set o update
+
+    Output
+    - action "get": str o None
+    - action "set" o "update" o "delete": dict con matched y modified
+    """
+    """
+    Query base
+    Encuentra el documento por slug y el elemento de dataSources por url.
+    """
+    query = {"slug": slug, "dataSources.url": datasource_url}
+
+    action_norm = (action or "").strip().lower()
+
+    if action_norm == "get":
+        """
+        Lee solo el elemento de dataSources que matchea usando projection posicional.
+        """
+        doc = companies.find_one(query, {"_id": 0, "dataSources.$": 1})
+        if not doc:
+            return None
+
+        ds_list = doc.get("dataSources") or []
+        if not ds_list or not isinstance(ds_list[0], dict):
+            return None
+
+        return ds_list[0].get("role")
+
+    if action_norm in {"set", "update"}:
+        """
+        Valida role
+        Setea dataSources.$.role en el elemento encontrado.
+        """
+        if not isinstance(role, str) or not role.strip():
+            raise ValueError("role debe ser un string no vacio para action set o update")
+
+        update = {"$set": {"dataSources.$.role": role.strip()}}
+        res = companies.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    if action_norm in {"delete", "unset", "remove"}:
+        """
+        Elimina el campo role del elemento encontrado.
+        """
+        update = {"$unset": {"dataSources.$.role": ""}}
+        res = companies.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    raise ValueError("action no valido. Usa get, set, update, delete")
+
+
+#KIND
+def datasource_kind(companies, slug: str, datasource_url: str, action: str = "get", kind: str | None = None):
+    """
+    Gestiona el campo dataSources.kind para una url dentro de dataSources.
+
+    action soportado
+    - "get": lee el kind actual
+    - "set": setea kind al valor entregado
+    - "update": alias de set
+    - "delete": elimina el campo kind usando unset
+
+    Input
+    - companies: colección PyMongo
+    - slug: slug de la company
+    - datasource_url: valor exacto en dataSources.url
+    - action: string con la operacion
+    - kind: string requerido en set o update
+
+    Output
+    - action "get": str o None
+    - action "set" o "update" o "delete": dict con matched y modified
+    """
+    """
+    Query base
+    Encuentra el documento por slug y el elemento de dataSources por url.
+    """
+    query = {"slug": slug, "dataSources.url": datasource_url}
+
+    action_norm = (action or "").strip().lower()
+
+    if action_norm == "get":
+        """
+        Lee solo el elemento de dataSources que matchea usando projection posicional.
+        """
+        doc = companies.find_one(query, {"_id": 0, "dataSources.$": 1})
+        if not doc:
+            return None
+
+        ds_list = doc.get("dataSources") or []
+        if not ds_list or not isinstance(ds_list[0], dict):
+            return None
+
+        return ds_list[0].get("kind")
+
+    if action_norm in {"set", "update"}:
+        """
+        Valida kind
+        Setea dataSources.$.kind en el elemento encontrado.
+        """
+        if not isinstance(kind, str) or not kind.strip():
+            raise ValueError("kind debe ser un string no vacio para action set o update")
+
+        update = {"$set": {"dataSources.$.kind": kind.strip()}}
+        res = companies.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    if action_norm in {"delete", "unset", "remove"}:
+        """
+        Elimina el campo kind del elemento encontrado.
+        """
+        update = {"$unset": {"dataSources.$.kind": ""}}
+        res = companies.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    raise ValueError("action no valido. Usa get, set, update, delete")
+
+
 
 ####################
 #INTERNAL UTILITIES#
@@ -481,8 +608,6 @@ def _belongs_to_company(url: str, primary_domain: str, mode: str = "loose") -> b
     labels = [part for part in h.split(".") if part]
     return base_label in labels
 
-
-
 def _normalize_sections(sections):
     """
     Normaliza el input sections para aceptar:
@@ -530,13 +655,6 @@ def _unique_preserve_order(values):
         seen.add(v2)
         out.append(v2)
     return out
-
-
-
-
-
-
-
 
 
 
