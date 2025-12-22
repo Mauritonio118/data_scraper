@@ -1,0 +1,27 @@
+utils/
+  __init__.py
+
+  urls/
+    __init__.py
+    extract.py             # html -> lista de urls
+    normalize.py           # limpiar/normalizar/parsear dominio y path
+    classify.py            # heurísticas de role/kind
+
+  html/
+    __init__.py
+    split_sections.py      # separa head/header/main/footer
+    text_clean.py          # remueve ruido, boilerplate
+
+  http/
+    __init__.py
+    client.py              # wrapper liviano httpx
+    headers.py             # generación de headers y user-agents
+
+  io/
+    __init__.py
+    cache.py               # caché opcional de respuestas/snapshots
+    files.py               # lectura/escritura de archivos locales
+
+tests/
+  test_urls.py
+  test_html.py

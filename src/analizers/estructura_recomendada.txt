@@ -1,0 +1,27 @@
+analizers/
+  __init__.py
+
+  config/
+    __init__.py
+    thresholds.py          # umbrales de score/ruido
+
+  rules/
+    __init__.py
+    filters.py             # reglas de exclusión (roles, dominios, paths)
+    scoring.py             # puntajes de relevancia
+    dedup.py               # deduplicación por fingerprint / similitud
+
+  processors/
+    __init__.py
+    normalize.py           # normalización de campos del modelo base
+    enrich.py              # enriquecer con metadata extra (whois, tldextract, etc.)
+    aggregations.py        # stats/resúmenes sobre colecciones
+
+  pipeline/
+    __init__.py
+    model_processor.py     # orquestador: modelo base -> modelo depurado
+    validators.py          # validación de esquema del modelo depurado
+
+tests/
+  test_filters.py
+  test_model_processor.py

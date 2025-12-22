@@ -56,6 +56,7 @@ Las dependencias principales están en `requirements.txt`:
 
 Instalación recomendada:
 
+```bash
 # Crear entorno virtual
 python -m venv envData
 
@@ -68,6 +69,86 @@ pip install -r requirements.txt
 
 # Instalar navegadores de Playwright
 playwright install
+```
 
+---
 
+## 3. Configuración de entorno
 
+- **Variables de entorno**  
+  Copia `.env.example` a `.env` y completa los datos de conexión a MongoDB (y cualquier otra credencial necesaria).
+
+- **Conexión a la DB**  
+  - El módulo `src/DB/mongo.py` expone funciones como `get_db()` que usan las variables de entorno.  
+  - El notebook `src/DB/info_querys.ipynb` muestra ejemplos de uso sobre la colección `companies`.
+
+---
+
+## 4. Flujos típicos de uso
+
+### 4.1. Probar queries sobre la colección `companies`
+
+1. Abrir el notebook `src/DB/info_querys.ipynb`.
+2. Ejecutar la celda de conexión (`from mongo import get_db` y selección de `companies`).
+3. Usar las secciones:
+   - **Slugs**: detectar slugs duplicados o vacíos.
+   - **Primary Domain**: revisar `primaryDomain` únicos y repetidos.
+   - **DataSources**:
+     - URLs únicas / repetidas.
+     - Links por secciones (`head`, `header`, `main`, `footer`).
+     - Textos extraídos.
+     - Campos `role` y `kind` para clasificar URLs.
+
+Este notebook está pensado como **guía de exploración y debugging** de los helpers en `companies_querys.py`.
+
+### 4.2. Ejecución del workflow completo (lista → scraping → modelo → DB)
+
+1. Preparar un CSV de empresas dentro de `src/workflows/` (ej: `companies_list.csv`).
+2. Revisar/ajustar parámetros en `src/workflows/list_to_scrap_to_model_to_DB.py`
+   (columnas de input, colección destino, etc.).
+3. Ejecutar el script:
+
+```bash
+envData\Scripts\activate
+python src/workflows/list_to_scrap_to_model_to_DB.py
+```
+
+4. Verificar los resultados:
+   - En la colección `companies` de MongoDB.
+   - Usando las queries de `companies_querys.py` o el notebook `info_querys.ipynb`.
+
+---
+
+## 5. Scrapers y utilidades: visión rápida
+
+- **Scraper principal**: `src/scrapers/page_deep_scraper.py`  
+  Toma una URL, baja el HTML, separa secciones, extrae links y textos, y genera una estructura que luego consume `model_builder.py`.
+
+- **Model builder**: `src/scrapers/model_builder.py`  
+  Convierte la data scrapeada en el **modelo base** que se guarda en `companies` (con `dataSources`, links, textos, etc.).
+
+- **Analizadores**:
+  - `data_filter.py`: aplica reglas para reducir ruido (ej: filtrar redes sociales, duplicados, paths irrelevantes).
+  - `model_processor.py`: pasos posteriores de limpieza/normalización del modelo.
+
+---
+
+## 6. Cómo contribuir / extender
+
+**Ideas de extensión:**
+- Agregar nuevos tipos de `role` y `kind` para clasificar mejor las URLs.
+- Incluir scrapers específicos para ciertas plataformas (ej: marketplaces, directorios).
+- Añadir tests unitarios para los helpers de `companies_querys.py` y las funciones de `scrapers/utils`.
+
+**Al hacer cambios:**
+- Mantén la misma estructura de carpetas.
+- Documenta los nuevos helpers con docstrings y, si aplica, agrega una celda de ejemplo en `info_querys.ipynb` o un nuevo notebook en `src/`.
+
+---
+
+## 7. Notas rápidas (cheatsheet)
+
+- **Activar entorno**: `envData\Scripts\activate`
+- **Instalar deps**: `pip install -r requirements.txt && playwright install`
+- **Probar DB y queries**: `src/DB/info_querys.ipynb`
+- **Workflow completo**: `python src/workflows/list_to_scrap_to_model_to_DB.py`
