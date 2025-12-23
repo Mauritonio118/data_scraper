@@ -1,9 +1,9 @@
 # Data Scraper
 
 ### Virtual Environment
-build_venv.py
+run build_venv.py
 
-# Algo
+## Algo
 
 Scraper(internet -> Data -> Modelo base)
 DB(Lectura y escritura de bases de datos)
