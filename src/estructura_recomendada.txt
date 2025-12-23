@@ -1,0 +1,24 @@
+src/
+  __init__.py
+
+  config/
+    __init__.py
+    settings.py             # carga .env y expone Settings tipado
+    profiles.py             # mapea entornos (dev/prod/test) a credenciales/flags
+
+  common/
+    __init__.py
+    logging.py              # logger base (stdout + archivo)
+    exceptions.py           # errores comunes del pipeline
+    types.py                # dataclasses/pydantic para modelos crudos y depurados
+    utils.py                # helpers compartidos (paths, fecha, hashing)
+
+  scrapers/                 # de internet -> datos crudos
+  analizers/                # limpieza y depuración del modelo
+  DB/                       # acceso a DB (ya definido)
+  workflows/                # orquestaciones end-to-end
+  tests/                    # unit/integration (mirroring módulos)
+
+docs/                       # notas cortas, decisiones de diseño
+.env.example                # template de variables
+requirements.txt            # deps exactas

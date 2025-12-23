@@ -1,0 +1,30 @@
+workflows/
+  __init__.py
+
+  inputs/
+    companies_list.csv      # entrada base
+    templates/              # plantillas de columnas esperadas
+
+  steps/
+    __init__.py
+    load_input.py           # lee csv/gsheets
+    enrich_urls.py          # normaliza urls iniciales
+    scrape.py               # usa scrapers.pipeline
+    build_model.py          # arma modelo base
+    clean_model.py          # llama analizers.pipeline
+    persist.py              # guarda en DB
+
+  jobs/
+    __init__.py
+    list_to_scrap_to_model_to_DB.py  # flujo end-to-end
+    backfill.py             # re-procesar históricos
+
+  notebooks/               # exploración y reportes
+
+  io/
+    __init__.py
+    outputs/               # csv/json con resultados
+    logs/                  # logs de corridas
+
+tests/
+  test_workflow_e2e.py

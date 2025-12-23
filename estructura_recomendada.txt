@@ -1,0 +1,19 @@
+data_scraper/
+  .env.example             # plantilla de variables
+  README.md                # docs de uso y flujos
+  requirements.txt         # dependencias
+  pyproject.toml           # (opcional) config de toolings
+  .gitignore
+
+  src/                     # código fuente principal
+    estructura_recomendada.txt
+
+  docs/                    # notas de diseño, ADRs, diagramas
+  scripts/                 # utilidades CLI (fixtures, exports)
+  tests/                   # suite unificada
+
+  notebooks/               # experimentos aislados fuera de src
+
+  ci/                      # configs de pipelines (lint/test)
+
+  tmp/                     # artefactos temporales (gitignored)

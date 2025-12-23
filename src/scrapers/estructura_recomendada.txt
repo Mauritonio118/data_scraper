@@ -1,0 +1,42 @@
+scrapers/
+  __init__.py
+
+  config/
+    __init__.py
+    defaults.py             # timeouts, retries, headers, user-agents
+    backoff.py              # estrategia de reintentos (http/playwright)
+
+  http/
+    __init__.py
+    request.py              # cliente httpx centralizado
+    fetchers.py             # funciones sync/async url -> html/bytes
+    rate_limit.py           # throttle por dominio
+
+  playwright/
+    __init__.py
+    context.py              # gestión de browser/contexto
+    fetchers.py             # páginas complejas (JS)
+
+  parsers/
+    __init__.py
+    html_splitter.py        # html -> {head, header, main, footer}
+    links_extractor.py      # extrae urls brutas
+    text_extractor.py       # extrae texto limpio
+    normalizers.py          # limpia/normaliza urls y textos
+
+  pipeline/
+    __init__.py
+    page_deep_scraper.py    # orquestador principal url -> snapshot crudo
+    model_builder.py        # snapshot crudo -> modelo base (dict)
+    validators.py           # chequeos de schema del modelo base
+
+  utils/
+    __init__.py
+    io.py                   # leer/escribir snapshots locales (debug)
+    fingerprints.py         # hashing de html/urls
+    selectors.py            # selectores comunes (css/xpath)
+
+tests/
+  test_http.py
+  test_parsers.py
+  test_pipeline.py
