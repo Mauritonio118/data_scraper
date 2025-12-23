@@ -1,0 +1,385 @@
+{
+  "_id": "675f0c1234567890abcdef01",
+
+  // =========================================================
+  // Identidad
+  // =========================================================
+  "slug": "realblocks", // string unico, ideal para URLs internas, ids estables, dedupe
+  "name": "RealBlocks", // nombre publico
+  "primaryDomain": "realblocks.com", // dominio canonico sin protocolo ni rutas
+  "description": "Plataforma de tokenización inmobiliaria enfocada en inversores institucionales.", // resumen corto
+
+  // Fecha de fundacion si la consigues
+  "foundedAt": "2018-04-12T00:00:00Z", // date
+
+  // =========================================================
+  // Estado operativo
+  // =========================================================
+  "operational": {
+    "status": "active",
+    // enum sugerido:
+    // "active" -> opera actualmente
+    // "inactive" -> cerro o nunca funciono
+    // "in_development" -> anunciado, aun sin operaciones
+    // "uncertain" -> falta evidencia suficiente
+    "updatedAt": "2025-01-10T00:00:00Z", // cuando se verifico el estado
+    "notes": "Operando segun sitio oficial." // texto libre, corto
+  },
+
+  // =========================================================
+  // Clasificaciones
+  // =========================================================
+  "classifications": {
+    // Que tipo de producto es, lista corta controlada
+    // ejemplos: "marketplace" | "issuer" | "tokenization_as_a_service" | "infrastructure"
+    //          "broker_dealer" | "custody" | "transfer_agent" | "ats_secondary"
+    "productType": ["marketplace"],
+
+    // Modelo de negocio
+    // ejemplos: "b2b" | "b2c" | "b2b2c"
+    "businessModel": ["b2b"],
+
+    // Tipo de inversor objetivo
+    // ejemplos: "retail" | "accredited" | "institutional" | "qualified_investor"
+    "targetInvestors": ["institutional", "accredited"],
+
+    // Foco de activos
+    // ejemplos: "real_estate" | "real_estate_debt" | "funds" | "rentals" | "development"
+    "assetFocus": ["real_estate"],
+
+    // Categorias tipo vertical, lista corta controlada
+    // ejemplos: "tokenized_real_estate" | "rwa" | "crowdfunding" | "reit_like"
+    //          "private_markets" | "alternatives"
+    "categories": ["tokenized_real_estate", "marketplace"],
+
+    // Tags son mas libres para busqueda, discovery, analitica
+    // ejemplos: "institutional_focus" | "fractional" | "secondary_market" | "usa"
+    //          "europe" | "multi_chain" | "compliance_heavy" | "white_label"
+    "tags": ["tokenizacion_inmobiliaria", "institutional_focus", "usa", "europe", "b2b"]
+  },
+
+  // =========================================================
+  // Geografia
+  // =========================================================
+  "geography": {
+    // HQ con normalizacion simple. Puedes sumar city, region, postalCode mas adelante
+    "hq": {
+      "country": "United States", // ideal usar ISO2: "US"
+      "city": "New York",         // opcional si no la tienes
+      "address": "500 5th Avenue, New York, NY 10110" // addressRaw
+    },
+
+    // Oficinas adicionales
+    "offices": [
+      { "country": "United Kingdom", "city": "London", "address": "10 Some Street, London" }
+    ],
+
+    // Paises donde opera o tiene acceso comercial
+    // ejemplos: ["US", "GB", "ES", "CL"]
+    "operatingCountries": ["United States", "United Kingdom", "Spain", "Chile"]
+  },
+
+  // =========================================================
+  // Cumplimiento y regulacion
+  // =========================================================
+  "compliance": {
+    // Reglas generales del producto
+    "kycRequired": true,            // si exigen verificacion de identidad
+    "accreditationRequired": true,  // si exigen acreditacion, qualified investor, similar
+
+    "regulation": {
+      // Areas regulatorias que toca el negocio
+      // ejemplos: "securities" | "crowdfunding" | "broker_dealer" | "investment_firm"
+      //          "aml" | "custody" | "marketplace" | "payments"
+      "scopes": ["investment_firm", "crowdfunding"],
+
+      // Lista de reguladores relevantes para la empresa
+      // ejemplos: "SEC" | "FINRA" | "FCA" | "CNMV" | "CMF"
+      "regulators": ["FCA"],
+
+      // Licencias o registros por jurisdiccion, lista porque puede haber varias
+      "licenses": [
+        {
+          "jurisdiction": "United Kingdom", // ideal ISO2: "GB"
+          "regulatorName": "FCA",
+          "licenseNumber": "FRN 123456",
+
+          // estado por licencia
+          // ejemplos: "active" | "inactive" | "uncertain"
+          "status": "active",
+
+          // tipo de licencia si lo puedes normalizar
+          // ejemplos: "MiFID_firm" | "crowdfunding_provider" | "broker_dealer"
+          "licenseType": null,
+
+          // scopes especificos si esa licencia cubre cosas concretas
+          "scopes": ["investment_firm", "crowdfunding"]
+        }
+      ]
+    }
+  },
+
+  // =========================================================
+  // Tecnologia y tokenizacion
+  // =========================================================
+  "tech": {
+    "isOnChain": true,
+
+    // Cadenas detalladas si te sirve para analitica
+    "chains": [
+      { "name": "Ethereum", "network": "mainnet", "chainId": 1 },
+      { "name": "Polygon", "network": "mainnet", "chainId": 137 }
+    ],
+
+    // Estandares de token o primitives onchain
+    // ejemplos: "ERC20" | "ERC721" | "ERC1155" | "ERC1400" | "ERC3643"
+    "tokenStandards": ["ERC20", "ERC1400"],
+
+    // Si quieres mantener techStack puedes usarlo para librerias, infra, custodios, etc
+    // ejemplos: "openzeppelin" | "fireblocks" | "chainalysis" | "sardine" | "sumsub"
+    "techStack": ["erc20", "erc1400"],
+
+    "supportsFractionalOwnership": true,
+    "supportsSecondaryMarket": true
+  },
+
+  // =========================================================
+  // Rutas de proyectos
+  // =========================================================
+  "projectRoutes": {
+    // baseUrls guarda la URL base completa, util para crawling directo
+    // ejemplo: ["https://ejemplo.com/project", "https://ejemplo.com/projects", "https://ejemplo.com/investments"]
+    "baseUrls": ["https://realblocks.com/project"],
+
+    // pathPrefixes guarda solo la ruta, util para matching sin importar subdominio o protocolo
+    // ejemplo: ["/project", "/projects", "/investments", "/offerings"]
+    "pathPrefixes": ["/project"],
+
+    "updatedAt": "2025-01-10T00:00:00Z"
+  },
+
+  // =========================================================
+  // Informacion legal y societaria
+  // =========================================================
+  "legal": {
+    "legalName": "RealBlocks Ltd",             // razon social
+    "legalForm": "Ltd",                        // ejemplos: "Inc" | "Ltd" | "GmbH" | "SpA"
+    "registrationNumber": "12345678",          // numero registro mercantil
+    "registrationCountry": "United Kingdom",   // ideal ISO2: "GB"
+    "registeredAddress": "Some Street 10, London"
+  },
+
+  // =========================================================
+  // Fuentes centralizadas
+  // =========================================================
+  "dataSources": [
+    {
+      "role": "official_site",
+      "kind": "website",
+      "url": "https://realblocks.com",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "lastCheckedAt": "2025-01-09T00:00:00Z"
+      }
+    },
+
+    {
+      "role": "social_profile",
+      "kind": "linkedin",
+      "url": "https://www.linkedin.com/company/realblocks",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "platform": "linkedin",
+        "lastCheckedAt": "2025-01-09T00:00:00Z"
+      }
+    },
+    {
+      "role": "social_profile",
+      "kind": "twitter",
+      "url": "https://twitter.com/realblocks_io",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "platform": "twitter",
+        "lastCheckedAt": "2025-01-09T00:00:00Z"
+      }
+    },
+
+    {
+      "role": "rating",
+      "kind": "trustpilot",
+      "url": "https://www.trustpilot.com/review/realblocks.com",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "rating": 4.3,
+        "reviewsCount": 120,
+        "lastCheckedAt": "2025-01-08T00:00:00Z"
+      }
+    },
+    {
+      "role": "directory_profile",
+      "kind": "crunchbase",
+      "url": "https://www.crunchbase.com/organization/realblocks",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "lastCheckedAt": "2025-01-08T00:00:00Z"
+      }
+    },
+
+    {
+      "role": "regulator_profile",
+      "kind": "regulator",
+      "url": "https://register.fca.org.uk/s/firm?id=123456",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "regulatorName": "FCA",
+        "licenseNumber": "FRN 123456",
+        "jurisdictionCountry": "United Kingdom",
+        "lastCheckedAt": "2025-01-08T00:00:00Z"
+      }
+    },
+
+    {
+      "role": "store_listing",
+      "kind": "play_store",
+      "url": "https://play.google.com/store/apps/details?id=com.realblocks.app",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "platform": "android",
+        "rating": 4.5,
+        "reviewsCount": 320,
+        "lastCheckedAt": "2025-01-07T00:00:00Z"
+      }
+    },
+    {
+      "role": "store_listing",
+      "kind": "app_store",
+      "url": "https://apps.apple.com/app/id1234567890",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "platform": "ios",
+        "rating": 4.6,
+        "reviewsCount": 210,
+        "lastCheckedAt": "2025-01-07T00:00:00Z"
+      }
+    },
+
+    {
+      "role": "research",
+      "kind": "article",
+      "url": "https://some-report.com/real-estate-tokenization-2024",
+      "links": {
+        "head": ["url1", "url2", "url3", "etc"],
+        "header": ["url1", "url2", "url3", "etc"],
+        "main": ["url1", "url2", "url3", "etc"],
+        "footer": ["url1", "url2", "url3", "etc"]
+      },
+      "texts": {
+        "head": ["text1", "text2", "text3", "etc"],
+        "header": ["text1", "text2", "text3", "etc"],
+        "main": ["text1", "text2", "text3", "etc"],
+        "footer": ["text1", "text2", "text3", "etc"]
+      },
+      "meta": {
+        "description": "Informe sectorial de tokenización inmobiliaria.",
+        "lastCheckedAt": "2025-01-08T00:00:00Z"
+      }
+    }
+  ],
+
+  // =========================================================
+  // Metadata
+  // =========================================================
+  "meta": {
+    "createdAt": "2025-01-09T00:00:00Z",
+    "updatedAt": "2025-01-10T00:00:00Z"
+  }
+}
+
