@@ -1,0 +1,58 @@
+VERSION 1:
+Role:
+"official_site": Para cualquier url que sea una pagina o sub pagina del sitio oficial de la empresa (<url>).
+"social_profile": Para cualquier url que lleve al perfil oficial DE LA EMPRESA a cualquier red social en sentido amplio (linkedin, instagram, youtube, X, Twitter,  facebook, telegram, whatsapp, discord, Tiktok, medium, spotify, github, pinterest, etc).
+"other_social_profile": Para cualquier url que lleve a redes sociales pero NO SEAN LAS REDES OFICIALES DE LA EMPRESA.
+"other_social": Para urls que llevan a paginas de redes sociales que no sean perfiles de usuarios (videos, post, publicaciones, etc).
+"store_listing": Para cualquier url que lleve tiendas de aplicaciones como play store, apple store, microsoft store, samsung store, huawei stores, etc.
+"regulator": Para cualquier url que lleve a paginas de instituciones reguladoras como la CMF, ECSP, SEC, etc.
+"news_media": Para cualquier url que lleve a portales de noticias y medios de comunicacion masivos.
+"web_utilities": Para url que referencien recursos internos del funcionamiento de la pagina (imagenes, rutas internas, videos externos, etc).
+"documents": Para urls que permitan descargar archivos y documentos (pdf, word, ppt, etc).
+"others":  Para urls que no puedan ser claramente clasificadas en ninguna de estas categorias.
+
+Kind: 
+"official_site" -> "website"
+"social_profile" -> "linkedin", "instagram", "youtube", "X", "facebook", "telegram", "whatsapp", "discord", "Tiktok", "medium", "spotify", "github", "pinterest", etc.
+"other_social_profile" -> "linkedin", "instagram", "youtube", "X", "facebook", "telegram", "whatsapp", "discord", "Tiktok", "medium", "spotify", "github", "pinterest", etc.
+"other_social" -> "linkedin", "instagram", "youtube", "X", "facebook", "telegram", "whatsapp", "discord", "Tiktok", "medium", "spotify", "github", "pinterest", etc.
+"store_listing" -> "play_store", "apple_store", "microsoft_store", "samsung_store", "huawei_store", etc.
+"regulator" -> "SEC", "FINRA", "CFTC", "FinCEN", "VARA", "FSRA", "DFSA2, "SCA", "ESMA", "MiFID II", "MiFIR", "MiCA", "ECSP", "NCA", "BaFin", "AMF", "CNMV", "CONSOB", "FSMA", "CMF", "UAF", etc.
+"news_media" -> "nbc", "businessinsider", "forbes", "bizjournals", "techcrunch", "emol", "df", "t13", "elmostrador", "nexnews", etc (En general extrar "kind" desde el dominio de la url).
+"web_utilities" -> "image", "video", "internal_route", "external_route", "other".
+"documents" -> "pdf", "excel" "ppt", "word", etc.
+"others" -> "website", "other".
+
+
+
+
+VERSION 2:
+Role:
+"official_site": Para cualquier url que sea una pagina o sub pagina del sitio oficial de la empresa (<url>).
+"official_social_profile": Para cualquier url que lleve al perfil oficial DE LA EMPRESA a cualquier red social en sentido amplio (linkedin, instagram, youtube, X, Twitter,  facebook, telegram, whatsapp, discord, Tiktok, medium, spotify, github, pinterest, etc).
+"official_social_content": Para urls que llevan a paginas de redes sociales con contenido oficial
+"social_profile": Para cualquier url que lleve a redes sociales pero NO SEAN LAS REDES OFICIALES DE LA EMPRESA.
+"social_content": Para urls que llevan a paginas de redes sociales con contenido no oficial (videos, post, publicaciones, etc).
+"store_listing": Para cualquier url que lleve tiendas de aplicaciones como play store, apple store, microsoft store, samsung store, huawei stores, etc.
+"regulator_profile": Para la ficha o registro de la empresa en un regulador.
+"regulator_reference": Para páginas de regulación genérica que no son sobre la empresa.
+"news_site": Para cualquier url que lleve a portales de noticias y medios de comunicacion masivos.
+"third_party": Para paginas de terceros que referencian a la empresa.
+"web_utilities": Para url que referencien recursos internos del funcionamiento de la pagina (imagenes, rutas internas, videos externos, etc).
+"documents": Para urls que permitan descargar archivos y documentos (pdf, word, ppt, etc).
+"others":  Para urls que no puedan ser claramente clasificadas en ninguna de estas categorias.
+
+Kind: 
+"official_site" -> "landing", "proyect", "product_page", "login_portal", "pricing", "blog", "partners", "events", "documentation", "investor_relations", "legal", "support", "careers", "whitepaper", etc.
+"official_social_profile" -> "linkedin", "instagram", "youtube", "X", "facebook", "telegram", "whatsapp", "discord", "Tiktok", "medium", "spotify", "github", "pinterest", etc.
+"official_social_content" ->
+"social_profile" -> "linkedin", "instagram", "youtube", "X", "facebook", "telegram", "whatsapp", "discord", "Tiktok", "medium", "spotify", "github", "pinterest", etc.
+"social_content" -> "linkedin", "instagram", "youtube", "X", "facebook", "telegram", "whatsapp", "discord", "Tiktok", "medium", "spotify", "github", "pinterest", etc.
+"store_listing" -> "play_store", "apple_store", "microsoft_store", "samsung_store", "huawei_store", etc.
+"regulator_profile" -> "SEC", "FINRA", "CFTC", "FinCEN", "VARA", "FSRA", "DFSA2, "SCA", "ESMA", "MiFID II", "MiFIR", "MiCA", "ECSP", "NCA", "BaFin", "AMF", "CNMV", "CONSOB", "FSMA", "CMF", "UAF", etc.
+"regulator_reference" -> 
+"news_site" -> "nbc", "businessinsider", "forbes", "bizjournals", "techcrunch", "emol", "df", "t13", "elmostrador", "nexnews", etc (En general extrar "kind" desde el dominio de la url).
+"third_party" -> "thecrowdspace", "trustpilot", "crunchbase", etc.
+"web_utilities" -> "image", "video", "internal_route", "external_route", "other".
+"documents" -> "pdf", "excel" "ppt", "word", etc.
+"others" -> "website", "other".                                                                                                                                                                                                                                                                                                                                                                                                                                            
