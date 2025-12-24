@@ -6,7 +6,7 @@ Incluye:
 - **Scrapers** HTTP/Playwright para extraer HTML, links y textos.
 - **Utilidades** para limpiar y normalizar URLs y contenido.
 - **Módulos de DB** para leer/escribir en MongoDB.
-- **Analizers** para filtrar y depurar la data.
+- **Analizers** para clasificar URLs por role y filtrar/depurar la data.
 - **Workflows** de extremo a extremo (lista de empresas → scraping → modelo → DB).
 
 ---
@@ -32,15 +32,31 @@ Carpeta `src/`:
   - `info_querys.ipynb`: cuaderno demostrativo para probar las queries de `companies_querys.py`.
   - `torpedo_mongo.py`: utilidades extra para operaciones en Mongo.
 - **`analizers/`**
-  - `data_filter.py`: filtros y reglas para limpiar/seleccionar datos.
-  - `model_processor.py`: transformación del modelo base → modelo depurado/listo para análisis.
+  - `role_classifier.py`: **Sistema de clasificación de roles para URLs.**
+    - Clase `RoleClassifier` con clasificadores extensibles y personalizables.
+    - Roles predefinidos: `official_site`, `official_social_profile`, `official_social_content`, `social_profile`, `social_content`, `store_listing`, `regulator_profile`, `regulator_reference`, `news_site`, `third_party`, `web_utilities`, `documents`, `unclassified`.
+    - Funciones de conveniencia: `classify_url()`, `get_available_roles()`, `register_custom_classifier()`.
+  - `datasource_role_classifier.py`: **Clasificador de roles para dataSources de compañías.**
+    - `classify_company_datasources(slug, target_roles)`: clasifica todos los dataSources de una compañía.
+    - `classify_single_datasource(slug, datasource_url)`: clasifica un dataSource específico.
+    - `get_datasources_by_role(slug, role)`: obtiene dataSources filtrados por role.
+    - `clear_all_company_roles(slug)`: elimina todos los roles de una compañía.
+    - `clear_single_datasource_role(slug, datasource_url)`: limpia el role de un dataSource específico.
+  - `data_filter.py`: filtros por dominio (redes sociales, app stores, noticias, legal, multimedia, etc.).
+  - `model_processor.py`: procesamiento y categorización de links extraídos del scraping.
+  - `ANALIZERS_DOCS.ipynb`: **Notebook de documentación y ejemplos** del sistema de clasificación.
 - **`workflows/`**
   - `list_to_scrap_to_model_to_DB.py` / `.ipynb`:
     workflow end-to-end desde una lista de empresas hasta el modelo en DB.
   - `companies_list*.csv`: listas de empresas de entrada/salida del proceso.
 - Otros:
-  - `data.txt`: datos de ejemplo / pruebas rápidas.
+  - `estructura_recomendada.txt`: notas internas sobre estructura del proyecto.
   - `Ian_test.ipynb`, `Mauro_test.ipynb`: notebooks de pruebas exploratorias.
+
+Raíz del proyecto:
+- **`build_venv.py`**: **Script automatizado para crear el entorno virtual.** Crea `.venv`, actualiza pip, instala dependencias y navegadores de Playwright automáticamente.
+- `requirements.txt`: dependencias del proyecto.
+- `.env` / `.env.example`: variables de entorno.
 
 ---
 
@@ -54,14 +70,31 @@ Las dependencias principales están en `requirements.txt`:
 - **DB / Data**: `pymongo`, `pandas`
 - **Config**: `python-dotenv`
 
-Instalación recomendada:
+### Instalación automatizada (recomendado)
+
+Usa el script `build_venv.py` para configurar todo automáticamente:
+
+```bash
+python build_venv.py
+```
+
+Este script:
+1. Crea un entorno virtual `.venv` si no existe.
+2. Actualiza pip a la última versión.
+3. Instala todas las dependencias de `requirements.txt`.
+4. Instala los navegadores de Playwright.
+
+### Instalación manual
 
 ```bash
 # Crear entorno virtual
-python -m venv envData
+python -m venv .venv
 
 # Activar entorno (Windows)
-envData\Scripts\activate
+.venv\Scripts\activate
+
+# Activar entorno (Linux/macOS)
+source .venv/bin/activate
 
 # Actualizar pip e instalar dependencias
 python -m pip install --upgrade pip
@@ -84,24 +117,7 @@ playwright install
 
 ---
 
-## 4. Flujos típicos de uso
-
-### 4.1. Probar queries sobre la colección `companies`
-
-1. Abrir el notebook `src/DB/info_querys.ipynb`.
-2. Ejecutar la celda de conexión (`from mongo import get_db` y selección de `companies`).
-3. Usar las secciones:
-   - **Slugs**: detectar slugs duplicados o vacíos.
-   - **Primary Domain**: revisar `primaryDomain` únicos y repetidos.
-   - **DataSources**:
-     - URLs únicas / repetidas.
-     - Links por secciones (`head`, `header`, `main`, `footer`).
-     - Textos extraídos.
-     - Campos `role` y `kind` para clasificar URLs.
-
-Este notebook está pensado como **guía de exploración y debugging** de los helpers en `companies_querys.py`.
-
-### 4.2. Ejecución del workflow completo (lista → scraping → modelo → DB)
+## 4. Workflow principal: lista → scraping → modelo → DB
 
 1. Preparar un CSV de empresas dentro de `src/workflows/` (ej: `companies_list.csv`).
 2. Revisar/ajustar parámetros en `src/workflows/list_to_scrap_to_model_to_DB.py`
@@ -109,7 +125,7 @@ Este notebook está pensado como **guía de exploración y debugging** de los he
 3. Ejecutar el script:
 
 ```bash
-envData\Scripts\activate
+.venv\Scripts\activate
 python src/workflows/list_to_scrap_to_model_to_DB.py
 ```
 
@@ -127,28 +143,37 @@ python src/workflows/list_to_scrap_to_model_to_DB.py
 - **Model builder**: `src/scrapers/model_builder.py`  
   Convierte la data scrapeada en el **modelo base** que se guarda en `companies` (con `dataSources`, links, textos, etc.).
 
-- **Analizadores**:
-  - `data_filter.py`: aplica reglas para reducir ruido (ej: filtrar redes sociales, duplicados, paths irrelevantes).
-  - `model_processor.py`: pasos posteriores de limpieza/normalización del modelo.
+- **Analizadores** (`src/analizers/`):
+  - `role_classifier.py`: clasifica URLs por tipo (sitio oficial, redes sociales, reguladores, etc.).
+  - `datasource_role_classifier.py`: aplica clasificación masiva a los dataSources de una compañía.
+  - `data_filter.py`: filtros por dominio para detectar redes sociales, app stores, noticias, etc.
+  - `model_processor.py`: pipeline de procesamiento que categoriza links extraídos.
 
 ---
 
 ## 6. Cómo contribuir / extender
 
 **Ideas de extensión:**
-- Agregar nuevos tipos de `role` y `kind` para clasificar mejor las URLs.
+- Agregar nuevos roles usando `register_custom_classifier()` en `role_classifier.py`.
+- Extender los dominios conocidos en los clasificadores existentes.
 - Incluir scrapers específicos para ciertas plataformas (ej: marketplaces, directorios).
 - Añadir tests unitarios para los helpers de `companies_querys.py` y las funciones de `scrapers/utils`.
 
 **Al hacer cambios:**
 - Mantén la misma estructura de carpetas.
-- Documenta los nuevos helpers con docstrings y, si aplica, agrega una celda de ejemplo en `info_querys.ipynb` o un nuevo notebook en `src/`.
+- Documenta los nuevos helpers con docstrings y, si aplica, agrega una celda de ejemplo en `ANALIZERS_DOCS.ipynb` o un nuevo notebook en `src/`.
 
 ---
 
 ## 7. Notas rápidas (cheatsheet)
 
-- **Activar entorno**: `envData\Scripts\activate`
-- **Instalar deps**: `pip install -r requirements.txt && playwright install`
-- **Probar DB y queries**: `src/DB/info_querys.ipynb`
-- **Workflow completo**: `python src/workflows/list_to_scrap_to_model_to_DB.py`
+| Acción | Comando |
+|--------|---------|
+| Setup automático | `python build_venv.py` |
+| Activar entorno (Windows) | `.venv\Scripts\activate` |
+| Activar entorno (Linux/macOS) | `source .venv/bin/activate` |
+| Instalar deps manualmente | `pip install -r requirements.txt && playwright install` |
+| Probar DB y queries | Abrir `src/DB/info_querys.ipynb` |
+| Probar clasificadores | Abrir `src/analizers/ANALIZERS_DOCS.ipynb` |
+| Workflow completo | `python src/workflows/list_to_scrap_to_model_to_DB.py` |
+| Clasificar dataSources | Ver sección 4.2 |
