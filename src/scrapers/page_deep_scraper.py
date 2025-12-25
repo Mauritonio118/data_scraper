@@ -164,31 +164,3 @@ async def page_deep_scraper(url_base: str, max_pages: int = 100):
         "allInternalLinks": list(all_internal_links),
         "pages": pages
     }
-
-#Agrega a la lista solo si el valor no se encuentra ya en la lista
-def append_unique(lst, value):
-    if value not in lst:
-        lst.append(value)
-        return True
-    return False
-
-#Entrega lista con todos los links unicos encontrados en en una pagina escrapeada a fondo
-def all_links_in_deep_scraped_page(deep_scraped):
-    largo = 0
-
-    scraped_urls_list = []
-    for page in deep_scraped["pages"]:
-        scraped_urls_list.append(page)
-    #print(scraped_urls_list)
-    
-    all_links_in_deep_scraped_page = []
-    for url in scraped_urls_list:
-        links = deep_scraped["pages"][url].get("links", {})
-        for link_list in links.values():
-            largo = largo + len(link_list)
-
-            for link in link_list:
-                append_unique(all_links_in_deep_scraped_page, link)
-
-    return all_links_in_deep_scraped_page
-
