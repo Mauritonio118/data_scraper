@@ -105,3 +105,8 @@ def close_client() -> None:
     if _client is not None:
         _client.close()
         _client = None
+
+if __name__ == "__main__":
+    print("Ping:", ping())
+    db = get_db()
+    print("Collections:", db.list_collection_names())

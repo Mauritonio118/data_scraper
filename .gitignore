@@ -20,3 +20,5 @@ Thumbs.db
 # Logs
 *.log
 
+# Base Local
+local_data_inmobiliaria

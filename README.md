@@ -21,10 +21,10 @@ Carpeta `src/`:
   - `utils/`
     - `requestHTTP.py`: `url → html` (peticiones HTTP con httpx / Playwright).
     - `html_spliter_head_header_main_footer.py`: `html → {head, header, main, footer}`.
-    - `urls_extractor_from_html.py`: extrae URLs desde HTML.
-    - `urls_utilities_cleaner.py`: filtra/limpia URLs (reduce lista a URLs útiles).
-    - `urls_format_from_domain.py`: normaliza dominios/URLs.
-    - `text_extractor_from_html.py`: extrae texto relevante desde HTML.
+    - `urls_extractor_from_html.py`: `html → (urls, urls, urls, urls)` para cada split.
+    - `urls_utilities_cleaner.py`: `urls → urls` filtro de ruido.
+    - `urls_format_from_domain.py`: `urls → urls` normalización
+    - `text_extractor_from_html.py`: `html → (str, str, str, str)` extrae texto relevante desde HTML.
 - **`DB/`**
   - `mongo.py`: conexión con MongoDB (`get_db`, etc.).
   - `companies_querys.py`: helpers para consultar la colección `companies`
