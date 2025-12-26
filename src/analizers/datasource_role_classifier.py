@@ -4,7 +4,12 @@ Clasifica la URL principal de cada objeto en dataSources y asigna el role corres
 """
 
 from typing import List, Dict, Any, Optional
-from src.DB.companies_querys import companies, get_unique_datasource_urls, datasource_role
+from src.DB.companies_querys import (
+    get_company_by_slug,
+    get_datasource_by_url,
+    get_unique_datasource_urls,
+    datasource_role
+)
 from src.analizers.role_classifier import classify_url, get_available_roles
 
 
@@ -32,9 +37,9 @@ def classify_company_datasources(
         }
     """
     # Obtener el documento de la compañía
-    doc = companies.find_one(
-        {"slug": slug},
-        {"_id": 0, "primaryDomain": 1, "dataSources.url": 1, "dataSources.role": 1}
+    doc = get_company_by_slug(
+        slug=slug,
+        projection={"_id": 0, "primaryDomain": 1, "dataSources.url": 1, "dataSources.role": 1}
     )
     
     if not doc:
@@ -95,7 +100,6 @@ def classify_company_datasources(
             
             # Actualizar el role en la DB usando la función existente
             result = datasource_role(
-                companies,
                 slug=slug,
                 datasource_url=datasource_url,
                 action="set",
@@ -134,9 +138,10 @@ def classify_single_datasource(
         }
     """
     # Obtener el documento de la compañía
-    doc = companies.find_one(
-        {"slug": slug, "dataSources.url": datasource_url},
-        {"_id": 0, "primaryDomain": 1, "dataSources.$": 1}
+    doc = get_datasource_by_url(
+        slug=slug,
+        datasource_url=datasource_url,
+        projection={"_id": 0, "primaryDomain": 1, "dataSources.$": 1}
     )
     
     if not doc or "dataSources" not in doc or not doc["dataSources"]:
@@ -174,7 +179,6 @@ def classify_single_datasource(
         
         # Actualizar el role en la DB
         result = datasource_role(
-            companies,
             slug=slug,
             datasource_url=datasource_url,
             action="set",
@@ -202,9 +206,9 @@ def get_datasources_by_role(
     Output:
       - Lista de dicts con formato [{"url": "...", "role": "..."}, ...]
     """
-    doc = companies.find_one(
-        {"slug": slug},
-        {"_id": 0, "dataSources.url": 1, "dataSources.role": 1}
+    doc = get_company_by_slug(
+        slug=slug,
+        projection={"_id": 0, "dataSources.url": 1, "dataSources.role": 1}
     )
     
     if not doc or "dataSources" not in doc:
@@ -254,9 +258,9 @@ def clear_all_company_roles(slug: str) -> Dict[str, Any]:
         }
     """
     # Obtener el documento de la compañía
-    doc = companies.find_one(
-        {"slug": slug},
-        {"_id": 0, "dataSources.url": 1, "dataSources.role": 1}
+    doc = get_company_by_slug(
+        slug=slug,
+        projection={"_id": 0, "dataSources.url": 1, "dataSources.role": 1}
     )
     
     if not doc:
@@ -305,7 +309,6 @@ def clear_all_company_roles(slug: str) -> Dict[str, Any]:
             
             # Eliminar el role usando datasource_role con action="delete"
             result = datasource_role(
-                companies,
                 slug=slug,
                 datasource_url=datasource_url,
                 action="delete"
@@ -338,9 +341,10 @@ def clear_single_datasource_role(slug: str, datasource_url: str) -> Dict[str, An
         }
     """
     # Obtener el documento de la compañía
-    doc = companies.find_one(
-        {"slug": slug, "dataSources.url": datasource_url},
-        {"_id": 0, "dataSources.$": 1}
+    doc = get_datasource_by_url(
+        slug=slug,
+        datasource_url=datasource_url,
+        projection={"_id": 0, "dataSources.$": 1}
     )
     
     if not doc or "dataSources" not in doc or not doc["dataSources"]:
@@ -368,7 +372,6 @@ def clear_single_datasource_role(slug: str, datasource_url: str) -> Dict[str, An
         
         # Eliminar el role usando datasource_role con action="delete"
         result = datasource_role(
-            companies,
             slug=slug,
             datasource_url=datasource_url,
             action="delete"
