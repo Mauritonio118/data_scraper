@@ -1,4 +1,4 @@
-from DB.mongo import get_db
+from src.DB.mongo import get_db
 from typing import List, Dict, Any, Optional
 from urllib.parse import urlparse
 

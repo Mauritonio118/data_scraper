@@ -167,13 +167,54 @@ python src/workflows/list_to_scrap_to_model_to_DB.py
 
 ## 7. Notas rápidas (cheatsheet)
 
-| Acción | Comando |
-|--------|---------|
-| Setup automático | `python build_venv.py` |
-| Activar entorno (Windows) | `.venv\Scripts\activate` |
-| Activar entorno (Linux/macOS) | `source .venv/bin/activate` |
-| Instalar deps manualmente | `pip install -r requirements.txt && playwright install` |
-| Probar DB y queries | Abrir `src/DB/info_querys.ipynb` |
-| Probar clasificadores | Abrir `src/analizers/ANALIZERS_DOCS.ipynb` |
-| Workflow completo | `python src/workflows/list_to_scrap_to_model_to_DB.py` |
-| Clasificar dataSources | Ver sección 4.2 |
+### Instalación
+
+1.  **Clonar el repositorio**:
+    ```bash
+    git clone https://github.com/Mauritonio118/data_scraper.git
+    cd data_scraper
+    ```
+
+2.  **Crear y activar entorno virtual** (Recomendado):
+    ```bash
+    python -m venv envData
+    # Windows:
+    .\envData\Scripts\activate
+    # Linux/Mac:
+    source envData/bin/activate
+    ```
+
+3.  **Instalar el proyecto en modo editable**:
+    Esto instalará todas las dependencias y configurará el paquete `src` para que sea accesible desde cualquier lugar.
+    ```bash
+    pip install -e .
+    ```
+
+4.  **Instalar navegadores de Playwright**:
+    ```bash
+    playwright install
+    ```
+
+### Ejecución
+
+#### Scripts
+Ejecutar los workflows como módulos desde la raíz del proyecto:
+
+```bash
+# Ejemplo: Correr el workflow principal
+python -m src.workflows.list_to_scrap_to_model_to_DB
+```
+
+#### Notebooks
+Los notebooks en `src/analizers`, `src/scrapers` y `src/DB` están configurados para usar el paquete instalado. Simplemente ábrelos con Jupyter o VSCode y ejecuta las celdas.
+
+#### Dependencias
+Si agregas nuevas dependencias, actualiza `requirements.txt` o `pyproject.toml` y corre:
+```bash
+pip install -e .
+```
+o
+```bash
+pip install -r requirements.txt
+```
+ 4.2 |

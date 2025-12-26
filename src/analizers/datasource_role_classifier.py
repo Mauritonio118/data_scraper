@@ -4,8 +4,8 @@ Clasifica la URL principal de cada objeto en dataSources y asigna el role corres
 """
 
 from typing import List, Dict, Any, Optional
-from DB.companies_querys import companies, get_unique_datasource_urls, datasource_role
-from analizers.role_classifier import classify_url, get_available_roles
+from src.DB.companies_querys import companies, get_unique_datasource_urls, datasource_role
+from src.analizers.role_classifier import classify_url, get_available_roles
 
 
 def classify_company_datasources(
