@@ -1,4 +1,4 @@
-from DB.mongo import get_db
+from src.DB.mongo import get_db
 from typing import List, Dict, Any, Optional
 from urllib.parse import urlparse
 
@@ -6,17 +6,31 @@ from urllib.parse import urlparse
 db = get_db()
 companies = db["companies"]
 
+def get_company_by_slug(slug: str, projection: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """
+    Retorna un documento de compañía por su slug.
+    """
+    return companies.find_one({"slug": slug}, projection)
+
+def get_datasource_by_url(slug: str, datasource_url: str, projection: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """
+    Retorna un documento que contiene el dataSource específico.
+    Usa la proyección posicional $ si no se especifica otra.
+    """
+    if projection is None:
+        projection = {"_id": 0, "dataSources.$": 1}
+    return companies.find_one({"slug": slug, "dataSources.url": datasource_url}, projection)
+
 ######
 #SLUG#
 ######
 
-def get_all_slugs(companies, include_empty: bool = False) -> List[str]:
+def get_all_slugs(include_empty: bool = False) -> List[str]:
     """
     Retorna todos los slugs desde la colección companies.
     Este resultado puede incluir repetición si existen documentos con el mismo slug.
 
     Parametros
-    - companies: colección PyMongo, ejemplo db["companies"]
     - include_empty: si es False filtra None y string vacio
                      si es True no aplica ese filtro
 
@@ -44,13 +58,12 @@ def get_all_slugs(companies, include_empty: bool = False) -> List[str]:
 
     return slugs
 
-def get_unique_slugs(companies, include_empty: bool = False) -> List[str]:
+def get_unique_slugs(include_empty: bool = False) -> List[str]:
     """
     Retorna todos los slugs unicos usando distinct.
     Este enfoque es simple y rapido para listas unicas.
 
     Parametros
-    - companies: colección PyMongo, ejemplo db["companies"]
     - include_empty: si es False filtra None y string vacio
                      si es True no aplica ese filtro
 
@@ -76,14 +89,13 @@ def get_unique_slugs(companies, include_empty: bool = False) -> List[str]:
 
     return out
 
-def get_repeated_slugs(companies, include_empty: bool = False) -> List[Dict[str, Any]]:
+def get_repeated_slugs(include_empty: bool = False) -> List[Dict[str, Any]]:
 
     """
     Retorna los slugs repetidos junto con su cantidad de apariciones.
     Usa aggregation para agrupar por slug y contar.
 
     Parametros
-    - companies: colección PyMongo, ejemplo db["companies"]
     - include_empty: si es False filtra None y string vacio
                      si es True no aplica ese filtro
 
@@ -127,7 +139,7 @@ def get_repeated_slugs(companies, include_empty: bool = False) -> List[Dict[str,
 #PRIMARY DOMAINS#
 #################
 
-def get_all_primary_domains(companies, include_empty: bool = False) -> List[str]:
+def get_all_primary_domains(include_empty: bool = False) -> List[str]:
     """
     Retorna todos los primaryDomain desde la colección companies.
     Este resultado puede incluir repetición si existen documentos con el mismo primaryDomain.
@@ -152,7 +164,7 @@ def get_all_primary_domains(companies, include_empty: bool = False) -> List[str]
 
     return out
 
-def get_unique_primary_domains(companies, include_empty: bool = False) -> List[str]:
+def get_unique_primary_domains(include_empty: bool = False) -> List[str]:
     """
     Retorna primaryDomain unicos usando distinct.
     """
@@ -174,7 +186,7 @@ def get_unique_primary_domains(companies, include_empty: bool = False) -> List[s
 
     return out
 
-def get_repeated_primary_domains(companies, include_empty: bool = False) -> List[Dict[str, Any]]:
+def get_repeated_primary_domains(include_empty: bool = False) -> List[Dict[str, Any]]:
     """
     Retorna primaryDomain repetidos con su count usando aggregation.
     """
@@ -213,7 +225,7 @@ def get_repeated_primary_domains(companies, include_empty: bool = False) -> List
 
 
 #URLS
-def get_unique_datasource_urls(companies, slug: str) -> list[str]:
+def get_unique_datasource_urls(slug: str) -> list[str]:
     """
     Trae todas las urls dentro de dataSources.url para una company identificada por slug.
     El output es una lista unica sin repeticion.
@@ -246,7 +258,7 @@ def get_unique_datasource_urls(companies, slug: str) -> list[str]:
     """
     return result[0]["uniqueUrls"] if result else []
 
-def get_repeated_datasource_urls(companies, slug: str) -> list[dict]:
+def get_repeated_datasource_urls(slug: str) -> list[dict]:
     """
     Trae todas las urls repetidas dentro de dataSources.url para una company identificada por slug.
     El output incluye cada url repetida junto a su count.
@@ -277,7 +289,7 @@ def get_repeated_datasource_urls(companies, slug: str) -> list[dict]:
     """
     return list(companies.aggregate(pipeline))
 
-def unique_company_urls_from_primary_domain(companies, slug: str, mode: str = "loose") -> list[str]:
+def unique_company_urls_from_primary_domain(slug: str, mode: str = "loose") -> list[str]:
     """
     Busca la company por slug y retorna una lista unica de urls de dataSources.url
     que pertenecen al primaryDomain.
@@ -311,7 +323,7 @@ def unique_company_urls_from_primary_domain(companies, slug: str, mode: str = "l
 
 
 #LINKS
-def get_links_from_company_datasource(companies, slug: str, datasource_url: str, sections=None) -> list[str]:
+def get_links_from_company_datasource(slug: str, datasource_url: str, sections=None) -> list[str]:
     """
     Trae todos los links de un dataSource especifico dentro de una company.
 
@@ -352,7 +364,7 @@ def get_links_from_company_datasource(companies, slug: str, datasource_url: str,
 
 
 #TEXTS
-def get_texts_from_company_datasource(companies, slug: str, datasource_url: str, sections=None, dedupe: bool = True) -> list[str]:
+def get_texts_from_company_datasource(slug: str, datasource_url: str, sections=None, dedupe: bool = True) -> list[str]:
     """
     Trae todos los textos de un dataSource especifico dentro de una company.
 
@@ -404,7 +416,7 @@ def get_texts_from_company_datasource(companies, slug: str, datasource_url: str,
 
 
 #ROLE
-def datasource_role(companies, slug: str, datasource_url: str, action: str = "get", role: str | None = None):
+def datasource_role(slug: str, datasource_url: str, action: str = "get", role: str | None = None):
     """
     Gestiona el campo dataSources.role para una url dentro de dataSources.
 
@@ -415,7 +427,6 @@ def datasource_role(companies, slug: str, datasource_url: str, action: str = "ge
     - "delete": elimina el campo role usando unset
 
     Input
-    - companies: colección PyMongo
     - slug: slug de la company
     - datasource_url: valor exacto en dataSources.url
     - action: string con la operacion
@@ -471,7 +482,7 @@ def datasource_role(companies, slug: str, datasource_url: str, action: str = "ge
 
 
 #KIND
-def datasource_kind(companies, slug: str, datasource_url: str, action: str = "get", kind: str | None = None):
+def datasource_kind(slug: str, datasource_url: str, action: str = "get", kind: str | None = None):
     """
     Gestiona el campo dataSources.kind para una url dentro de dataSources.
 
@@ -482,7 +493,6 @@ def datasource_kind(companies, slug: str, datasource_url: str, action: str = "ge
     - "delete": elimina el campo kind usando unset
 
     Input
-    - companies: colección PyMongo
     - slug: slug de la company
     - datasource_url: valor exacto en dataSources.url
     - action: string con la operacion

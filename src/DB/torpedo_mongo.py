@@ -14,7 +14,7 @@ Idea general:
 # -----------------------------
 # get_db() devuelve la base seleccionada según APP_ENV en tu .env
 # db["companies"] devuelve la colección "companies"
-from DB.mongo import get_db, ping
+from src.DB.mongo import get_db, ping
 
 db = get_db()
 companies = db["companies"]

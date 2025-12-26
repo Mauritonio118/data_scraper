@@ -7,6 +7,8 @@ from src.DB.mongo import get_db
 from src.scrapers.model_builder import from_url_model
 from pathlib import Path
 from datetime import datetime
+import logging
+from src.utils.logger import setup_logger
 
 #Coneccion MongoDB
 db = get_db()
@@ -24,13 +26,20 @@ df = pd.read_csv(INPUT_PATH, dtype=str, keep_default_na=False)
 output_cols = ["ID", "Nombre", "Page", "Slug", "In_mongo"]
 
 async def main():
+    # Configurar logger
+    # Se guardará en logs/scraping_process.log
+    logger = setup_logger(__name__, log_file="logs/scraping_process.log", level=logging.INFO)
+    
+    logger.info(f"Iniciando proceso. Input: {INPUT_PATH}, Output: {OUTPUT_PATH}")
+
     #Coneccion con el Output
     with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=output_cols)
         writer.writeheader()
 
         #Iteracion df de entrada
-        for row in df.itertuples(index=False):
+        total_rows = len(df)
+        for index, row in enumerate(df.itertuples(index=False), 1):
 
             #Estructura de Salida por default
             out_row = {"ID": getattr(row, "ID", ""), "Nombre": getattr(row, "Nombre", ""), "Page": getattr(row, "Page", ""), "Slug": "", "In_mongo": "No"}
@@ -38,7 +47,8 @@ async def main():
             #Extraccion datos base
             primary_domain = row.Page
             name = row.Nombre
-            print("ID: " + str(row.ID) + "  Companie: "+ name + "  Page: " + primary_domain)
+            
+            logger.info(f"[{index}/{total_rows}] Procesando ID: {row.ID} | Compañía: {name} | Page: {primary_domain}")
             
             #Intentar scrapeo
             try:
@@ -48,13 +58,12 @@ async def main():
                     url = "https://" + primary_domain
 
                     #Escrapeo profundo
-                    #from_url_model(url=None, name=None, slug=None, primary_domain=None)
-                    print("Sraping start: " + datetime.now().strftime("%H:%M:%S.%f") + "  url: " + url)
+                    logger.info(f"Scraping iniciado para: {url}")
                     model = await from_url_model(url=url, name=name, primary_domain=primary_domain)
                     
                     #Guardar modelo en DB
                     companiesDB.insert_one(model)
-                    print("Model in Mongo")
+                    logger.info("Modelo guardado exitosamente en Mongo")
 
                     #Ajuste del output
                     out_row["Slug"] = model["slug"]
@@ -70,12 +79,12 @@ async def main():
                     url = "https://" + primary_domain
 
                     #Escrapeo profundo
-                    print("Sraping start: " + datetime.now().strftime("%H:%M:%S.%f") + "  url: " + url)
+                    logger.info(f"Scraping iniciado (sin nombre) para: {url}")
                     model = await from_url_model(url=url, primary_domain=primary_domain)
 
                     #Guardar modelo en DB
                     companiesDB.insert_one(model)
-                    print("Model in Mongo")
+                    logger.info("Modelo guardado exitosamente en Mongo")
 
                     #Ajuste del output
                     out_row["Slug"] = model["slug"]
@@ -87,7 +96,7 @@ async def main():
 
                 
                 else:
-                    print("No hay url")
+                    logger.warning(f"Fila saltada: No hay URL válida para ID {row.ID}")
 
                     #Ajuste del output
                     out_row["In_mongo"] = "NO. Sin url."
@@ -98,8 +107,7 @@ async def main():
 
             #Abordar error
             except Exception as e:
-
-                print("ERROR  Tipo: " + str(type(e)) + "  Mensaje: " + str(e))
+                logger.error(f"Error procesando {name or primary_domain}", exc_info=True)
 
                 #Ajuste del output.
                 out_row["In_mongo"] = "NO, excepción. Tipo: " + str(type(e)) + ". Mensaje: " + str(e)
@@ -109,8 +117,7 @@ async def main():
                 f.flush()  # fuerza guardado inmediato en disco
             
             finally:
-                print("")
-                print("-----------------------------------------------")
+                logger.info("-" * 50)
 
 
 if __name__ == "__main__":

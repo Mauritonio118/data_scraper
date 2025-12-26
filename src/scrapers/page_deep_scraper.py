@@ -1,5 +1,7 @@
 from urllib.parse import urlparse
 
+#BASE DE IMPORTACIONES PARA WORKFLOW
+"""
 #Import lectura HTML
 from src.scrapers.utils.requestHTTP import fetch_html
 
@@ -13,6 +15,22 @@ from src.scrapers.utils.urls_format_from_domain import urls_format_from_domain
 
 #import manejo de textos desde el html
 from src.scrapers.utils.text_extractor_from_html import text_extractor_from_html
+"""
+
+#Import lectura HTML
+from src.scrapers.utils.requestHTTP import fetch_html
+
+#import manejo de html
+from src.scrapers.utils.html_spliter_head_header_main_footer import html_spliter_head_header_main_footer
+
+#Import manejo de urls desde el HTML
+from src.scrapers.utils.urls_extractor_from_html import urls_extractor_from_html  
+from src.scrapers.utils.urls_utilities_cleaner import urls_utilities_cleaner
+from src.scrapers.utils.urls_format_from_domain import urls_format_from_domain
+
+#import manejo de textos desde el html
+from src.scrapers.utils.text_extractor_from_html import text_extractor_from_html
+
 
 
 def url_processor_from_html(html, url_base):
@@ -164,31 +182,3 @@ async def page_deep_scraper(url_base: str, max_pages: int = 100):
         "allInternalLinks": list(all_internal_links),
         "pages": pages
     }
-
-#Agrega a la lista solo si el valor no se encuentra ya en la lista
-def append_unique(lst, value):
-    if value not in lst:
-        lst.append(value)
-        return True
-    return False
-
-#Entrega lista con todos los links unicos encontrados en en una pagina escrapeada a fondo
-def all_links_in_deep_scraped_page(deep_scraped):
-    largo = 0
-
-    scraped_urls_list = []
-    for page in deep_scraped["pages"]:
-        scraped_urls_list.append(page)
-    #print(scraped_urls_list)
-    
-    all_links_in_deep_scraped_page = []
-    for url in scraped_urls_list:
-        links = deep_scraped["pages"][url].get("links", {})
-        for link_list in links.values():
-            largo = largo + len(link_list)
-
-            for link in link_list:
-                append_unique(all_links_in_deep_scraped_page, link)
-
-    return all_links_in_deep_scraped_page
-

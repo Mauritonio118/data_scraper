@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "data_scraper"
+version = "0.1.0"
+description = "A data scraping project"
+dependencies = [
+    "notebook",
+    "httpx",
+    "httpx[http2]",
+    "brotli",
+    "BeautifulSoup4",
+    "lxml",
+    "tldextract",
+    "playwright",
+    "pymongo",
+    "pandas",
+    "python-dotenv"
+]
+requires-python = ">=3.7"
+
+[tool.setuptools]
+packages = ["src"]

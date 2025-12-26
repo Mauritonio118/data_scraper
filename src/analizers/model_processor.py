@@ -1,6 +1,6 @@
 import asyncio
-from scrapers.page_deep_scraper import page_deep_scraper
-from scrapers.model_builder import page_deep_scraped_to_model
+from src.scrapers.page_deep_scraper import page_deep_scraper
+from src.scrapers.model_builder import page_deep_scraped_to_model
 import data_filter as filter
 
 async def main():
