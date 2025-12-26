@@ -9,3 +9,4 @@ playwright
 pymongo
 pandas
 python-dotenv
+nbstripout

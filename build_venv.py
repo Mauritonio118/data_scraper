@@ -57,6 +57,10 @@ def main():
     run([py, "-m", "playwright", "install"], 
         "Instalando navegadores de Playwright...")
 
+    # 5. Configurar nbstripout para limpiar notebooks automágicamente
+    run([py, "-m", "nbstripout", "--install"], 
+        "Configurando git filters para limpiar outputs de notebooks (nbstripout)...")
+
     # Mensaje final
     print("\n" + "=" * 60)
     print("✅ CONFIGURACIÓN COMPLETADA EXITOSAMENTE")

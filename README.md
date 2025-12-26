@@ -66,6 +66,7 @@ Raíz del proyecto:
 Las dependencias principales están en `requirements.txt`:
 
 - **Jupyter**: `notebook`
+- **Control de Versiones para Notebooks**: `nbstripout`
 - **HTTP / Parsing**: `httpx`, `httpx[http2]`, `brotli`, `BeautifulSoup4`, `lxml`, `tldextract`
 - **Scraping avanzado**: `playwright`
 - **DB / Data**: `pymongo`, `pandas`
@@ -84,6 +85,7 @@ Este script:
 2. Actualiza pip a la última versión.
 3. **Instala el proyecto en modo editable** (`pip install -e .`), lo que configura el paquete `src` para que sea accesible desde cualquier lugar.
 4. Instala los navegadores de Playwright.
+5. **Configura nbstripout** para limpiar automáticamente los outputs de los notebooks antes de un `commit`.
 
 Después de ejecutar el script, solo necesitas:
 - Activar el entorno: `envData\Scripts\activate` (Windows) o `source envData/bin/activate` (Linux/Mac)
@@ -213,16 +215,8 @@ Ejecutar los workflows como módulos desde la raíz del proyecto:
 python -m src.workflows.list_to_scrap_to_model_to_DB
 ```
 
-#### Notebooks
-Los notebooks en `src/analizers`, `src/scrapers` y `src/DB` están configurados para usar el paquete instalado. Simplemente ábrelos con Jupyter o VSCode y ejecuta las celdas.
-
-#### Dependencias
-Si agregas nuevas dependencias, actualiza `requirements.txt` o `pyproject.toml` y corre:
-```bash
-pip install -e .
-```
-o
-```bash
-pip install -r requirements.txt
-```
+#### Control de Versiones en Notebooks
+Este proyecto utiliza `nbstripout` para evitar guardar los outputs y metadatos de los notebooks en Git. Esto mantiene el repositorio limpio y enfocado solo en el código y markdown.
+- La configuración es automática al ejecutar `build_venv.py`.
+- Al hacer `git commit`, los outputs se limpian automáticamente sin afectar tu archivo local.
  4.2 |
