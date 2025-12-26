@@ -6,6 +6,7 @@ Sistema flexible y extensible que permite agregar, modificar o eliminar criterio
 from typing import Optional, List, Set, Callable
 from urllib.parse import urlparse
 import re
+from src.analizers import domain_lists
 
 
 class RoleClassifier:
@@ -162,25 +163,10 @@ class RoleClassifier:
     
     def _is_official_social_profile(self, url: str, primary_domain: str) -> bool:
         """Verifica si es un perfil oficial de la empresa en redes sociales."""
-        social_domains = [
-            "linkedin.com/company/", "linkedin.com/in/",
-            "instagram.com/", "youtube.com/@", "youtube.com/c/", "youtube.com/channel/",
-            "twitter.com/", "x.com/",
-            "facebook.com/", "fb.com/",
-            "tiktok.com/@",
-            "github.com/",
-            "medium.com/@",
-            "pinterest.com/",
-            "spotify.com/",
-            "telegram.me/", "t.me/",
-            "discord.gg/", "discord.com/",
-            "wa.me/", "whatsapp.com/"
-        ]
-        
         url_lower = url.lower()
         
         # Verifica que sea una red social conocida
-        is_social = any(domain in url_lower for domain in social_domains)
+        is_social = any(domain in url_lower for domain in domain_lists.SOCIAL_PROFILE_DOMAINS)
         if not is_social:
             return False
         
@@ -191,30 +177,18 @@ class RoleClassifier:
             # Busca el nombre de la empresa en la URL
             return domain_parts.lower() in url_lower
     
-
-
     def _is_official_social_content(self, url: str, primary_domain: str) -> bool:
         """Verifica si es contenido oficial en redes sociales (posts, videos, etc)."""
         # Similar a official_social_profile pero para contenido específico
         if self._is_official_social_profile(url, primary_domain):
             # Si ya es un perfil oficial, verifica si es contenido específico
-            content_patterns = [
-                "/post/", "/video/", "/watch", "/status/", "/p/", "/reel/",
-                "/photo/", "/album/", "/story/"
-            ]
-            return any(pattern in url.lower() for pattern in content_patterns)
+            return any(pattern in url.lower() for pattern in domain_lists.SOCIAL_CONTENT_PATTERNS)
         return False
     
     def _is_social_profile(self, url: str, primary_domain: str) -> bool:
         """Verifica si es un perfil en redes sociales pero NO oficial."""
-        social_domains = [
-            "linkedin.com", "instagram.com", "youtube.com", "twitter.com", "x.com",
-            "facebook.com", "tiktok.com", "github.com", "medium.com", "pinterest.com",
-            "spotify.com", "telegram.me", "t.me", "discord.gg", "discord.com"
-        ]
-        
         url_lower = url.lower()
-        is_social = any(domain in url_lower for domain in social_domains)
+        is_social = any(domain in url_lower for domain in domain_lists.SOCIAL_GENERIC_DOMAINS)
         
         if not is_social:
             return False
@@ -225,64 +199,28 @@ class RoleClassifier:
     def _is_social_content(self, url: str, primary_domain: str) -> bool:
         """Verifica si es contenido en redes sociales NO oficial."""
         if self._is_social_profile(url, primary_domain):
-            content_patterns = [
-                "/post/", "/video/", "/watch", "/status/", "/p/", "/reel/",
-                "/photo/", "/album/", "/story/"
-            ]
-            return any(pattern in url.lower() for pattern in content_patterns)
+            return any(pattern in url.lower() for pattern in domain_lists.SOCIAL_CONTENT_PATTERNS)
         return False
     
     def _is_store_listing(self, url: str, primary_domain: str) -> bool:
         """Verifica si es una tienda de aplicaciones."""
-        store_domains = [
-            "play.google.com/store",
-            "apps.apple.com",
-            "microsoft.com/store",
-            "galaxy.store",
-            "appgallery.huawei.com"
-        ]
-        
         url_lower = url.lower()
-        return any(domain in url_lower for domain in store_domains)
+        return any(domain in url_lower for domain in domain_lists.STORE_DOMAINS)
     
     def _is_regulator_profile(self, url: str, primary_domain: str) -> bool:
         """Verifica si es la ficha/registro de la empresa en un regulador."""
-        regulator_domains = [
-            "register.fca.org.uk", "fca.org.uk",
-            "sec.gov", "finra.org",
-            "cftc.gov", "fincen.gov",
-            "cnmv.es", "cmf.cl",
-            "consob.it", "amf-france.org",
-            "bafin.de", "fsma.be",
-            "fsra.ae", "dfsa.ae", "sca.gov.ae",
-            "vara.ae", "ecsp.com"
-        ]
-        
         url_lower = url.lower()
-        is_regulator = any(domain in url_lower for domain in regulator_domains)
+        is_regulator = any(domain in url_lower for domain in domain_lists.REGULATOR_DOMAINS)
         
         if not is_regulator:
             return False
         
-        # Para ser un perfil, típicamente tiene términos como "firm", "register", "company"
-        profile_indicators = ["firm", "register", "company", "entity", "license"]
-        return any(indicator in url_lower for indicator in profile_indicators)
+        return any(indicator in url_lower for indicator in domain_lists.REGULATOR_PROFILE_INDICATORS)
     
     def _is_regulator_reference(self, url: str, primary_domain: str) -> bool:
         """Verifica si es una página de regulación genérica (no específica de la empresa)."""
-        regulator_domains = [
-            "register.fca.org.uk", "fca.org.uk",
-            "sec.gov", "finra.org",
-            "cftc.gov", "fincen.gov",
-            "cnmv.es", "cmf.cl",
-            "consob.it", "amf-france.org",
-            "bafin.de", "fsma.be",
-            "fsra.ae", "dfsa.ae", "sca.gov.ae",
-            "vara.ae", "ecsp.com"
-        ]
-        
         url_lower = url.lower()
-        is_regulator = any(domain in url_lower for domain in regulator_domains)
+        is_regulator = any(domain in url_lower for domain in domain_lists.REGULATOR_DOMAINS)
         
         if not is_regulator:
             return False
@@ -292,16 +230,8 @@ class RoleClassifier:
     
     def _is_news_site(self, url: str, primary_domain: str) -> bool:
         """Verifica si es un portal de noticias o medio de comunicación."""
-        news_domains = [
-            "bbc.com", "cnn.com", "reuters.com", "bloomberg.com",
-            "forbes.com", "techcrunch.com", "businessinsider.com",
-            "wsj.com", "nytimes.com", "theguardian.com",
-            "emol.com", "latercera.com", "elmostrador.cl",
-            "df.cl", "t13.cl", "nexnews.cl"
-        ]
-        
         url_lower = url.lower()
-        return any(domain in url_lower for domain in news_domains)
+        return any(domain in url_lower for domain in domain_lists.NEWS_DOMAINS)
     
     def _is_third_party(self, url: str, primary_domain: str) -> bool:
         """Verifica si es una página de terceros que referencia a la empresa."""
@@ -324,38 +254,28 @@ class RoleClassifier:
         if any(excluded):
             return False
         
-        # Directorios conocidos de terceros
-        third_party_domains = [
-            "crunchbase.com", "trustpilot.com", "thecrowdspace.com",
-            "producthunt.com", "g2.com", "capterra.com"
-        ]
-        
         url_lower = url.lower()
-        return any(domain in url_lower for domain in third_party_domains)
+        return any(domain in url_lower for domain in domain_lists.THIRD_PARTY_DOMAINS)
     
     def _is_web_utility(self, url: str, primary_domain: str) -> bool:
         """Verifica si es un recurso interno (imágenes, videos, rutas internas)."""
         url_lower = url.lower()
         
         # Extensiones de imágenes
-        image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", ".ico"]
-        if any(url_lower.endswith(ext) for ext in image_extensions):
+        if any(url_lower.endswith(ext) for ext in domain_lists.IMAGE_EXTENSIONS):
             return True
         
         # Extensiones de videos
-        video_extensions = [".mp4", ".webm", ".avi", ".mov", ".mkv"]
-        if any(url_lower.endswith(ext) for ext in video_extensions):
+        if any(url_lower.endswith(ext) for ext in domain_lists.VIDEO_EXTENSIONS):
             return True
         
         # Rutas de recursos comunes
-        resource_paths = ["/assets/", "/static/", "/images/", "/img/", "/css/", "/js/", "/fonts/"]
-        if any(path in url_lower for path in resource_paths):
+        if any(path in url_lower for path in domain_lists.RESOURCE_PATHS):
             return True
         
         # URLs de CDN comunes
-        cdn_domains = ["cdn.", "static.", "assets.", "media."]
         url_host = self._extract_host(url)
-        if url_host and any(cdn in url_host for cdn in cdn_domains):
+        if url_host and any(cdn in url_host for cdn in domain_lists.CDN_DOMAINS):
             return True
         
         return False
@@ -364,12 +284,7 @@ class RoleClassifier:
         """Verifica si es una URL para descargar documentos."""
         url_lower = url.lower()
         
-        document_extensions = [
-            ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
-            ".txt", ".csv", ".zip", ".rar", ".7z"
-        ]
-        
-        return any(url_lower.endswith(ext) for ext in document_extensions)
+        return any(url_lower.endswith(ext) for ext in domain_lists.DOCUMENT_EXTENSIONS)
     
     # ============================================================
     # UTILIDADES
