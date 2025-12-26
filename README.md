@@ -54,7 +54,8 @@ Carpeta `src/`:
   - `Ian_test.ipynb`, `Mauro_test.ipynb`: notebooks de pruebas exploratorias.
 
 Raíz del proyecto:
-- **`build_venv.py`**: **Script automatizado para crear el entorno virtual.** Crea `.venv`, actualiza pip, instala dependencias y navegadores de Playwright automáticamente.
+- **`build_venv.py`**: **Script automatizado para crear el entorno virtual `envData`.** Crea el entorno, actualiza pip, instala el proyecto en modo editable (`pip install -e .`) y configura navegadores de Playwright automáticamente.
+- **`pyproject.toml`**: Configuración del proyecto para instalación editable.
 - `requirements.txt`: dependencias del proyecto.
 - `.env` / `.env.example`: variables de entorno.
 
@@ -79,30 +80,37 @@ python build_venv.py
 ```
 
 Este script:
-1. Crea un entorno virtual `.venv` si no existe.
+1. Crea un entorno virtual `envData` si no existe.
 2. Actualiza pip a la última versión.
-3. Instala todas las dependencias de `requirements.txt`.
+3. **Instala el proyecto en modo editable** (`pip install -e .`), lo que configura el paquete `src` para que sea accesible desde cualquier lugar.
 4. Instala los navegadores de Playwright.
+
+Después de ejecutar el script, solo necesitas:
+- Activar el entorno: `envData\Scripts\activate` (Windows) o `source envData/bin/activate` (Linux/Mac)
+- Configurar el archivo `.env` con tus credenciales de MongoDB
 
 ### Instalación manual
 
+Si prefieres configurar manualmente:
+
 ```bash
 # Crear entorno virtual
-python -m venv .venv
+python -m venv envData
 
 # Activar entorno (Windows)
-.venv\Scripts\activate
+envData\Scripts\activate
 
 # Activar entorno (Linux/macOS)
-source .venv/bin/activate
+source envData/bin/activate
 
-# Actualizar pip e instalar dependencias
+# Actualizar pip e instalar proyecto en modo editable
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+pip install -e .
 
 # Instalar navegadores de Playwright
 playwright install
 ```
+
 
 ---
 
