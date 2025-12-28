@@ -65,7 +65,8 @@ NEWS_DOMAINS = [
     "wsj.com", "nytimes.com", "theguardian.com",
     "emol.com", "latercera.com", "elmostrador.cl",
     "df.cl", "t13.cl", "nexnews.cl", "fintechile.org",
-    "energiesmedia.com", "chocale.cl", "axios.com"
+    "energiesmedia.com", "chocale.cl", "axios.com",
+    "pauta.cl", "theclinic.cl"
 ]
 
 # THIRD PARTY DIRECTORIES
