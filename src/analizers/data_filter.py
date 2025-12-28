@@ -1,56 +1,6 @@
 from urllib.parse import urlparse
+from src.analizers import domain_lists
 
-
-SOCIAL_DOMAIN = {
-    "facebook.com",
-    "instagram.com",
-    "linkedin.com",
-    "twitter.com",
-    "x.com",
-    "tiktok.com",
-    "threads.net",
-    "pinterest.com",
-    "github.com",
-    "medium.com",
-    "farcaster.xyz",
-    "notion.site"
-}
-
-APP_DOMAIN = {
-    "apps.apple.com",
-    "play.google.com"
-}
-
-NEWS_DOMAIN = {
-    "df.cl",
-    "emol.com",
-    "fintechile.org",
-    "energiesmedia.com",
-    "chocale.cl",
-    "algorand.co",
-    "axios.com"
-}
-
-PROPERTY_DOMAIN = {
-    "airbnb.cl"
-}
-
-LEGAL_DOMAIN = {
-    "sii.cl",
-    "buk.cl",
-    "digitaloceanspaces.com"
-}
-
-TO_BE_IGNORED = {
-    "intercom.com",
-    "googleapis.com"
-}
-
-MULTIMEDIA_DOMAIN = {
-    "intercomcdn.com"
-}
-
-YOUTUBE_DOMAIN = "youtube.com"
 
 def _netloc(link):
     netloc = urlparse(link).netloc.lower()
@@ -69,33 +19,33 @@ def is_social_media(link):
     netloc = _netloc(link)
     return any(
         netloc == d or netloc.endswith("." + d)
-        for d in SOCIAL_DOMAIN
+        for d in domain_lists.SOCIAL_GENERIC_DOMAINS
     )
 
 def is_youtube_profile(link):
     netloc = _netloc(link)
     path = urlparse(link).path
-    return netloc == YOUTUBE_DOMAIN and path.startswith("/@")
+    return "youtube.com" in netloc and path.startswith("/@")
 
 
 def is_multimedia(link):
     netloc = _netloc(link)
     return any(
         netloc == d or netloc.endswith("." + d)
-        for d in MULTIMEDIA_DOMAIN
+        for d in domain_lists.CDN_DOMAINS
     )
 
 def is_youtube_video(link):
     netloc = _netloc(link)
     path = urlparse(link).path
-    return netloc == YOUTUBE_DOMAIN and path.startswith("/watch")
+    return "youtube.com" in netloc and path.startswith("/watch")
 
 
 def is_app_store(link):
     netloc = _netloc(link)
     return any(
         netloc == d or netloc.endswith("." + d)
-        for d in APP_DOMAIN
+        for d in domain_lists.STORE_DOMAINS
     )
 
 
@@ -103,7 +53,7 @@ def is_news(link):
     netloc = _netloc(link)
     return any(
         netloc == d or netloc.endswith("." + d)
-        for d in NEWS_DOMAIN
+        for d in domain_lists.NEWS_DOMAINS
     )
 
 
@@ -111,7 +61,7 @@ def is_property(link):
     netloc = _netloc(link)
     return any(
         netloc == d or netloc.endswith("." + d)
-        for d in PROPERTY_DOMAIN
+        for d in domain_lists.THIRD_PARTY_DOMAINS
     )
 
 
@@ -119,7 +69,7 @@ def is_legal(link):
     netloc = _netloc(link)
     return any(
         netloc == d or netloc.endswith("." + d)
-        for d in LEGAL_DOMAIN
+        for d in domain_lists.REGULATOR_DOMAINS
     )
 
 
@@ -127,5 +77,5 @@ def is_to_be_ignored(link):
     netloc = _netloc(link)
     return any(
         netloc == d or netloc.endswith("." + d)
-        for d in TO_BE_IGNORED
+        for d in domain_lists.IGNORE_DOMAINS
     )
