@@ -52,7 +52,7 @@ async def main():
             
             #Intentar scrapeo
             try:
-                if pd.notna(primary_domain) and pd.notna(name):
+                if pd.notna(primary_domain) and primary_domain != "" and pd.notna(name) and name != "":
 
                     #Creacion url para scrapeo
                     url = "https://" + primary_domain
@@ -73,7 +73,7 @@ async def main():
                     writer.writerow(out_row)
                     f.flush()  # fuerza guardado inmediato en disco
                 
-                elif pd.notna(primary_domain):
+                elif pd.notna(primary_domain) and primary_domain != "":
 
                     #Creacion url para scrapeo
                     url = "https://" + primary_domain
