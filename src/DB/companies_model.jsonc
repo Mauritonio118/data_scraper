@@ -131,6 +131,19 @@
     "updatedAt": "2025-01-10T00:00:00Z"
   },
   // =========================================================
+  // Aplicaciones Moviles
+  // =========================================================
+  "mobileApps": [
+    {
+      "url": "https://play.google.com/store/apps/details?id=com.realblocks.app",
+      "store": "google_play" // "google_play" | "apple_store"
+    },
+    {
+      "url": "https://apps.apple.com/us/app/realblocks/id1234567890",
+      "store": "apple_store"
+    }
+  ],
+  // =========================================================
   // Informacion legal y societaria
   // =========================================================
   "legal": {
@@ -317,7 +330,6 @@
         "lastCheckedAt": "2025-01-07T00:00:00Z"
       }
     },
-
     {
       "role": "research",
       "kind": "article",
