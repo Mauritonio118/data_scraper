@@ -11,7 +11,7 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from src.DB.mongo import get_db
-from src.analizers.datasource_role_classifier import classify_company_datasources
+from src.analizers.datasource_role_classifier import classify_role_company_datasources
 
 # Setup logging
 log_dir = os.path.join(project_root, 'logs')
@@ -76,7 +76,7 @@ def process_active_companies(target_roles: Optional[List[str]] = None):
             
             try:
                 # Call the classifier
-                result = classify_company_datasources(slug=slug, target_roles=target_roles)
+                result = classify_role_company_datasources(slug=slug, target_roles=target_roles)
                 
                 if result.get("error"):
                     logger.warning(f"[{slug}] Result error: {result.get('error')}")

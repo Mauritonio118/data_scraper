@@ -12,15 +12,6 @@ def get_company_by_slug(slug: str, projection: Optional[Dict[str, Any]] = None) 
     """
     return companies.find_one({"slug": slug}, projection)
 
-def get_datasource_by_url(slug: str, datasource_url: str, projection: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
-    """
-    Retorna un documento que contiene el dataSource específico.
-    Usa la proyección posicional $ si no se especifica otra.
-    """
-    if projection is None:
-        projection = {"_id": 0, "dataSources.$": 1}
-    return companies.find_one({"slug": slug, "dataSources.url": datasource_url}, projection)
-
 ######
 #SLUG#
 ######
@@ -135,6 +126,31 @@ def get_repeated_slugs(include_empty: bool = False) -> List[Dict[str, Any]]:
     return out
 
 
+def get_slugs_not_inactive() -> List[str]:
+    """
+    Retorna todos los slugs de empresas cuyo operational.status NO es 'inactive'.
+    Incluye documentos con status distinto a 'inactive' y documentos donde el campo no existe.
+
+    Output
+    - List[str] con slugs.
+    """
+    query = {"operational.status": {"$ne": "inactive"}}
+    projection = {"_id": 0, "slug": 1}
+
+    cursor = companies.find(query, projection)
+
+    slugs = []
+    for doc in cursor:
+        slug = doc.get("slug")
+        if isinstance(slug, str):
+            slug2 = slug.strip()
+            if slug2:
+                slugs.append(slug2)
+
+    return slugs
+
+
+
 #################
 #PRIMARY DOMAINS#
 #################
@@ -223,6 +239,14 @@ def get_repeated_primary_domains(include_empty: bool = False) -> List[Dict[str, 
 #DATA SOURCES#
 ##############
 
+def get_datasource_by_url(slug: str, datasource_url: str, projection: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """
+    Retorna un documento que contiene el dataSource específico.
+    Usa la proyección posicional $ si no se especifica otra.
+    """
+    if projection is None:
+        projection = {"_id": 0, "dataSources.$": 1}
+    return companies.find_one({"slug": slug, "dataSources.url": datasource_url}, projection)
 
 #URLS
 def get_unique_datasource_urls(slug: str) -> list[str]:

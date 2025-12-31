@@ -13,7 +13,7 @@ from src.DB.companies_querys import (
 from src.analizers.role_classifier import classify_url, get_available_roles
 
 
-def classify_company_datasources(
+def classify_role_company_datasources(
     slug: str,
     target_roles: Optional[List[str]] = None
 ) -> Dict[str, Any]:
@@ -114,7 +114,7 @@ def classify_company_datasources(
     return stats
 
 
-def classify_single_datasource(
+def classify_role_single_datasource(
     slug: str,
     datasource_url: str,
     target_roles: Optional[List[str]] = None
