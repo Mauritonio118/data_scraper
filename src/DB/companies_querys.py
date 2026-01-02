@@ -125,7 +125,6 @@ def get_repeated_slugs(include_empty: bool = False) -> List[Dict[str, Any]]:
 
     return out
 
-
 def get_slugs_not_inactive() -> List[str]:
     """
     Retorna todos los slugs de empresas cuyo operational.status NO es 'inactive'.
@@ -148,7 +147,6 @@ def get_slugs_not_inactive() -> List[str]:
                 slugs.append(slug2)
 
     return slugs
-
 
 
 #################
@@ -345,7 +343,6 @@ def unique_company_urls_from_primary_domain(slug: str, mode: str = "loose") -> l
 
     return sorted(unique)
 
-
 #LINKS
 def get_links_from_company_datasource(slug: str, datasource_url: str, sections=None) -> list[str]:
     """
@@ -385,7 +382,6 @@ def get_links_from_company_datasource(slug: str, datasource_url: str, sections=N
             collected.extend(lst)
 
     return _unique_preserve_order(collected)
-
 
 #TEXTS
 def get_texts_from_company_datasource(slug: str, datasource_url: str, sections=None, dedupe: bool = True) -> list[str]:
@@ -437,7 +433,6 @@ def get_texts_from_company_datasource(slug: str, datasource_url: str, sections=N
             if t2:
                 out.append(t2)
     return out
-
 
 #ROLE
 def datasource_role(slug: str, datasource_url: str, action: str = "get", role: str | None = None):
@@ -504,7 +499,6 @@ def datasource_role(slug: str, datasource_url: str, action: str = "get", role: s
 
     raise ValueError("action no valido. Usa get, set, update, delete")
 
-
 #KIND
 def datasource_kind(slug: str, datasource_url: str, action: str = "get", kind: str | None = None):
     """
@@ -570,6 +564,93 @@ def datasource_kind(slug: str, datasource_url: str, action: str = "get", kind: s
 
     raise ValueError("action no valido. Usa get, set, update, delete")
 
+
+#############
+#MOBILE APPS#
+#############
+
+def upsert_mobile_app(slug: str, url: str, store: str) -> Dict[str, int]:
+    """
+    Agrega o actualiza una mobileApp en el array mobileApps.
+    - Si la url ya existe, actualiza el store.
+    - Si no existe, agrega el objeto {url, store}.
+    - Si el array mobileApps no existe, lo crea.
+    """
+    # 1. Intentar actualizar si existe
+    query = {"slug": slug, "mobileApps.url": url}
+    update = {"$set": {"mobileApps.$.store": store}}
+    
+    result = companies.update_one(query, update)
+    
+    if result.matched_count > 0:
+        return {"matched": result.matched_count, "modified": result.modified_count}
+        
+    # 2. Si no existe (matched_count == 0), hacemos push
+    # Usamos addToSet para evitar duplicados si corre en paralelo, aunque la logica de arriba ya cubre update.
+    # Pero para ser consistentes con "agregar si no existe", push es lo estandar tras fallo de update por url.
+    
+    query_push = {"slug": slug}
+    update_push = {"$push": {"mobileApps": {"url": url, "store": store}}}
+    
+    result_push = companies.update_one(query_push, update_push)
+    
+    return {"matched": result_push.matched_count, "modified": result_push.modified_count}
+
+def get_mobile_apps(slug: str, store: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Retorna la lista de mobileApps para un slug.
+    Opcionalmente filtra por store.
+    """
+    project = {"_id": 0, "mobileApps": 1}
+    doc = companies.find_one({"slug": slug}, project)
+    
+    if not doc or "mobileApps" not in doc:
+        return []
+        
+    apps = doc["mobileApps"]
+    if not isinstance(apps, list):
+        return []
+        
+    if store:
+        return [app for app in apps if isinstance(app, dict) and app.get("store") == store]
+        
+    return apps
+
+def remove_mobile_app(slug: str, url: Optional[str] = None, store: Optional[str] = None) -> Dict[str, int]:
+    """
+    Elimina datos dentro de mobileApps.
+    - Si url y store son None: Deja el campo mobileApps vacio ([]).
+    - Si url existe: borra coincidencias de url.
+    - Si store existe: borra coincidencias de store.
+    - Si ambos existen: borra coincidencias exactas de url Y store.
+    """
+    query = {"slug": slug}
+    
+    if url is None and store is None:
+        # Vaciar el array
+        update = {"$set": {"mobileApps": []}}
+    else:
+        # Construir filtro para pull
+        pull_filter = {}
+        if url:
+            pull_filter["url"] = url
+        if store:
+            pull_filter["store"] = store
+            
+        update = {"$pull": {"mobileApps": pull_filter}}
+        
+    result = companies.update_one(query, update)
+    return {"matched": result.matched_count, "modified": result.modified_count}
+
+def delete_mobile_apps_field(slug: str) -> Dict[str, int]:
+    """
+    Elimina completamente el campo mobileApps del documento.
+    """
+    query = {"slug": slug}
+    update = {"$unset": {"mobileApps": ""}}
+    
+    result = companies.update_one(query, update)
+    return {"matched": result.matched_count, "modified": result.modified_count}
 
 
 ####################
@@ -689,26 +770,3 @@ def _unique_preserve_order(values):
         seen.add(v2)
         out.append(v2)
     return out
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
