@@ -106,28 +106,31 @@ class RoleClassifier:
         self.register_classifier("official_social_profile", self._is_official_social_profile)
         
         # OFFICIAL_SOCIAL_CONTENT: Contenido oficial en redes sociales
-        self.register_classifier("official_social_content", self._is_official_social_content)
+        #self.register_classifier("official_social_content", self._is_official_social_content)
         
         # SOCIAL_PROFILE: Perfiles en redes sociales NO oficiales
-        self.register_classifier("social_profile", self._is_social_profile)
+        #self.register_classifier("social_profile", self._is_social_profile)
         
         # SOCIAL_CONTENT: Contenido en redes sociales NO oficial
-        self.register_classifier("social_content", self._is_social_content)
+        #self.register_classifier("social_content", self._is_social_content)
         
         # STORE_LISTING: Tiendas de aplicaciones
         self.register_classifier("store_listing", self._is_store_listing)
         
         # REGULATOR_PROFILE: Ficha/registro de la empresa en un regulador
-        self.register_classifier("regulator_profile", self._is_regulator_profile)
+        #self.register_classifier("regulator_profile", self._is_regulator_profile)
         
         # REGULATOR_REFERENCE: Páginas de regulación genérica
-        self.register_classifier("regulator_reference", self._is_regulator_reference)
+        #self.register_classifier("regulator_reference", self._is_regulator_reference)
         
         # NEWS_SITE: Portales de noticias y medios
         self.register_classifier("news_site", self._is_news_site)
         
         # THIRD_PARTY: Páginas de terceros que referencian a la empresa
         self.register_classifier("third_party", self._is_third_party)
+        
+        # SOCIAL_WEB_UTILITY: Rutas para compartir en redes sociales
+        self.register_classifier("social_web_utility", self._is_social_web_utility)
         
         # WEB_UTILITIES: Recursos internos (imágenes, rutas internas, videos)
         self.register_classifier("web_utilities", self._is_web_utility)
@@ -164,9 +167,22 @@ class RoleClassifier:
     def _is_official_social_profile(self, url: str, primary_domain: str) -> bool:
         """Verifica si es un perfil oficial de la empresa en redes sociales."""
         url_lower = url.lower()
+
+        # Check filter: if it is a social web utility (sharing link), it is NOT a profile
+        if self._is_social_web_utility(url, primary_domain):
+            return False
         
-        # Verifica que sea una red social conocida
-        is_social = any(domain in url_lower for domain in domain_lists.SOCIAL_PROFILE_DOMAINS)
+        # Verifica que sea una red social conocida con coincidencia exacta de dominio
+        is_social = False
+        for domain in domain_lists.SOCIAL_PROFILE_DOMAINS:
+            idx = url_lower.find(domain)
+            if idx != -1:
+                # Verificar delimitadores para evitar falsos positivos (ej: box.com vs x.com)
+                # El dominio debe estar al inicio o precedido por '.', '/', ':'
+                if idx == 0 or url_lower[idx-1] in [".", "/", ":"]:
+                    is_social = True
+                    break
+        
         if not is_social:
             return False
         
@@ -201,6 +217,20 @@ class RoleClassifier:
         if self._is_social_profile(url, primary_domain):
             return any(pattern in url.lower() for pattern in domain_lists.SOCIAL_CONTENT_PATTERNS)
         return False
+
+    def _is_social_web_utility(self, url: str, primary_domain: str) -> bool:
+        """
+        Verifica si es una utilidad de red social (ej: compartir, tweet intent).
+        Generalmente tienen doble https o patrones específicos de compartir.
+        """
+        url_lower = url.lower()
+        
+        # Patrón 1: Doble https (común en redirects de compartir)
+        if url_lower.count("http") > 1:
+            return True
+            
+        # Patrón 2: Keywords de compartir
+        return any(pattern in url_lower for pattern in domain_lists.SOCIAL_SHARING_PATTERNS)
     
     def _is_store_listing(self, url: str, primary_domain: str) -> bool:
         """Verifica si es una tienda de aplicaciones."""

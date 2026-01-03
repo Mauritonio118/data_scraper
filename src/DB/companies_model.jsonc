@@ -144,6 +144,19 @@
     }
   ],
   // =========================================================
+  // Perfiles Sociales
+  // =========================================================
+  "socialProfiles": [
+    {
+      "url": "https://linkedin.com/company/realblocks",
+      "platform": "linkedin" // "linkedin" | "X" | "facebook" | "instagram" | "youtube" | "telegram" | "discord"
+    },
+    {
+      "url": "https://X.com/realblocks_io",
+      "platform": "X"
+    }
+  ],
+  // =========================================================
   // Informacion legal y societaria
   // =========================================================
   "legal": {

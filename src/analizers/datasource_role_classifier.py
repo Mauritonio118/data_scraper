@@ -13,7 +13,7 @@ from src.DB.companies_querys import (
 from src.analizers.role_classifier import classify_url, get_available_roles
 
 
-def classify_company_datasources(
+def classify_role_company_datasources(
     slug: str,
     target_roles: Optional[List[str]] = None
 ) -> Dict[str, Any]:
@@ -114,7 +114,7 @@ def classify_company_datasources(
     return stats
 
 
-def classify_single_datasource(
+def classify_role_single_datasource(
     slug: str,
     datasource_url: str,
     target_roles: Optional[List[str]] = None
@@ -240,20 +240,21 @@ def get_datasources_by_role(
     return result
 
 
-def clear_all_company_roles(slug: str) -> Dict[str, Any]:
+def clear_all_company_roles(slug: str, target_roles: Optional[List[str]] = None) -> Dict[str, Any]:
     """
-    Elimina todos los roles de todos los dataSources de una compañía.
-    Deja la empresa como si nunca se hubiera procesado para identificar ningún role.
+    Elimina roles de los dataSources de una compañía.
+    Por defecto elimina TODOS los roles. Si se especifica target_roles, solo elimina esos.
     
     Input:
       - slug: slug de la company
+      - target_roles: Lista de roles específicos a eliminar (opcional)
     
     Output:
       - Dict con estadísticas:
         {
           "processed": <int>,  # Total de dataSources procesados
           "cleared": <int>,     # DataSources que tenían role y fueron limpiados
-          "not_found": <int>,   # DataSources que no tenían role
+          "not_found": <int>,   # DataSources que no tenían role (o no coincidían con target)
           "updated": <int>      # Cantidad de dataSources actualizados en la DB
         }
     """
@@ -303,8 +304,14 @@ def clear_all_company_roles(slug: str) -> Dict[str, Any]:
         
         # Verificar si tiene role
         has_role = ds.get("role") is not None
+        current_role = ds.get("role")
         
         if has_role:
+            # Si se especificaron target_roles, verificar si el role actual está en la lista
+            if target_roles is not None and current_role not in target_roles:
+                stats["not_found"] += 1
+                continue
+
             stats["cleared"] += 1
             
             # Eliminar el role usando datasource_role con action="delete"

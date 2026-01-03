@@ -2,6 +2,8 @@ import re
 import requests
 from urllib.parse import urlparse, parse_qs, urlunparse, quote
 from typing import List, Dict, Optional, Set
+from src.analizers.datasource_role_classifier import get_datasources_by_role
+from src.DB.companies_querys import upsert_mobile_app
 
 # Timeout settings for requests
 TIMEOUT = 10
@@ -9,7 +11,51 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
 
-def analyze_store_links(urls: List[str]) -> List[str]:
+
+def process_and_store_mobile_apps(slug: str) -> Dict[str, int]:
+    """
+    Orchestrates the process of finding, analyzing, verifying, and storing mobile app links for a company.
+    
+    Process:
+    1. Fetches candidate URLs from company datasources.
+    2. Analyzes them to find valid Store links (Google Play / App Store).
+    3. Verifies they exist (status 200).
+    4. Formats them for the model.
+    5. Updates the database (upsert_mobile_app).
+    
+    Returns a dictionary with statistics.
+    """
+    # 1. Get candidates
+    datasources = get_datasources_by_role(slug)
+    candidate_urls = [d['url'] for d in datasources if d.get('url')]
+    
+    # 2. Analyze
+    optimal_links = _analyze_store_links(candidate_urls)
+    
+    # 3. Verify
+    valid_links = _verify_links_existence(optimal_links)
+    
+    # 4. Format
+    formatted_links = _format_store_links_for_model(valid_links)
+    
+    # 5. Update DB
+    upserted_count = 0
+    for item in formatted_links:
+        url = item['url']
+        store = item['store']
+        # upsert_mobile_app returns {'matched': N, 'modified': N}
+        # We just count how many we processed successfully to the DB call
+        upsert_mobile_app(slug, url, store)
+        upserted_count += 1
+        
+    return {
+        "candidates_found": len(candidate_urls),
+        "optimal_links_found": len(optimal_links),
+        "valid_links_verified": len(valid_links),
+        "apps_stored": upserted_count
+    }
+
+def _analyze_store_links(urls: List[str]) -> List[str]:
     """
     Analyzes a list of URLs (presumably store listings), resolves redirects,
     filters for valid Google Play and Apple App Store links, and returns
@@ -154,7 +200,7 @@ def analyze_store_links(urls: List[str]) -> List[str]:
 
     return optimal_links
 
-def verify_links_existence(urls: List[str]) -> List[str]:
+def _verify_links_existence(urls: List[str]) -> List[str]:
     """
     Verifies a list of URLs by making HTTP requests.
     Returns only the URLs that respond with a successful status code (200-299).
@@ -198,7 +244,7 @@ def verify_links_existence(urls: List[str]) -> List[str]:
                 
     return valid_links
 
-def format_store_links_for_model(urls: List[str]) -> List[Dict[str, str]]:
+def _format_store_links_for_model(urls: List[str]) -> List[Dict[str, str]]:
     """
     Takes a list of valid store URLs and formats them for the companies data model.
     Output structure:
