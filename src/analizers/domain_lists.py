@@ -33,6 +33,10 @@ SOCIAL_CONTENT_PATTERNS = [
     "/photo/", "/album/", "/story/"
 ]
 
+SOCIAL_SHARING_PATTERNS = [
+    "sharer", "intent/tweet", "share/url", "send?text="
+]
+
 # APP STORES
 STORE_DOMAINS = [
     "play.google.com",
