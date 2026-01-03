@@ -98,6 +98,16 @@ def analyze_and_store_social_profiles(slug: str) -> Dict[str, Any]:
         if p['url'] in verified_urls:
             valid_profiles.append(p)
 
+    # 3.5 Resolve LinkedIn Redirects
+    valid_profiles = _resolve_linkedin_redirects(valid_profiles)
+
+    # Re-Dedupe after resolution (in case multiple inputs resolved to same final)
+    # We need to re-dedupe based on URL only
+    unique_map = {}
+    for p in valid_profiles:
+        unique_map[p['url']] = p
+    valid_profiles = list(unique_map.values())
+
     # 4. Dictionary for checking duplicates per platform
     platform_counts = {}
     for p in valid_profiles:
@@ -250,6 +260,11 @@ def _clean_url(url: str) -> Optional[str]:
     if scheme in ['http', 'https', '']:
         scheme = 'https'
 
+    # Youtube Cleanups
+    if netloc == "youtube.com" or netloc == "youtu.be":
+        if path.startswith("/c/"):
+            path = "/@" + path[3:]
+            
     clean = urlunparse((scheme, netloc, path, '', new_query, ''))
     
     # Enforce lowercase
@@ -307,3 +322,42 @@ def _verify_urls_existence(urls: List[str]) -> Set[str]:
             pass
             
     return valid
+
+def _resolve_linkedin_redirects(profiles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Follows redirects for LinkedIn profiles to find the canonical URL.
+    E.g. linkedin.com/company/foo often redirects to linkedin.com/company/foo-inc or similar.
+    """
+    resolved_profiles = []
+    session = requests.Session()
+    session.headers.update(HEADERS)
+
+    for p in profiles:
+        if p['platform'] == 'linkedin':
+            try:
+                # We specifically want to follow redirects
+                resp = session.get(p['url'], timeout=10, allow_redirects=True)
+                
+                # Check status
+                if 200 <= resp.status_code < 300:
+                    final_url = resp.url
+                    # Clean the final URL to ensure it matches our standards (lowercase, no www, etc)
+                    clean_final = _clean_url(final_url)
+                    
+                    if clean_final and clean_final != p['url']:
+                        # Logging happens at debug level to avoid clutter unless we want to see it
+                        logging.info(f"  [LinkedIn Redirect] {p['url']} -> {clean_final}")
+                        p['url'] = clean_final
+                        
+                else:
+                    # If blocked or error, keep original
+                    pass
+                    
+            except Exception as e:
+                # On error, keep original
+                logging.debug(f"  [LinkedIn Resolve Error] {p['url']} -> {e}")
+                pass
+        
+        resolved_profiles.append(p)
+    
+    return resolved_profiles
