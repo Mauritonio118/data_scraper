@@ -653,6 +653,91 @@ def delete_mobile_apps_field(slug: str) -> Dict[str, int]:
     return {"matched": result.matched_count, "modified": result.modified_count}
 
 
+#################
+#SOCIAL PROFILES#
+#################
+
+def upsert_social_profile(slug: str, url: str, platform: str) -> Dict[str, int]:
+    """
+    Agrega o actualiza un socialProfile en el array socialProfiles.
+    - Si la url ya existe, actualiza la platform.
+    - Si no existe, agrega el objeto {url, platform}.
+    - Si el array socialProfiles no existe, lo crea.
+    """
+    # 1. Intentar actualizar si existe
+    query = {"slug": slug, "socialProfiles.url": url}
+    update = {"$set": {"socialProfiles.$.platform": platform}}
+    
+    result = companies.update_one(query, update)
+    
+    if result.matched_count > 0:
+        return {"matched": result.matched_count, "modified": result.modified_count}
+        
+    # 2. Si no existe (matched_count == 0), hacemos push
+    query_push = {"slug": slug}
+    update_push = {"$push": {"socialProfiles": {"url": url, "platform": platform}}}
+    
+    result_push = companies.update_one(query_push, update_push)
+    
+    return {"matched": result_push.matched_count, "modified": result_push.modified_count}
+
+def get_social_profiles(slug: str, platform: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Retorna la lista de socialProfiles para un slug.
+    Opcionalmente filtra por platform.
+    """
+    project = {"_id": 0, "socialProfiles": 1}
+    doc = companies.find_one({"slug": slug}, project)
+    
+    if not doc or "socialProfiles" not in doc:
+        return []
+        
+    profiles = doc["socialProfiles"]
+    if not isinstance(profiles, list):
+        return []
+        
+    if platform:
+        return [p for p in profiles if isinstance(p, dict) and p.get("platform") == platform]
+        
+    return profiles
+
+def remove_social_profile(slug: str, url: Optional[str] = None, platform: Optional[str] = None) -> Dict[str, int]:
+    """
+    Elimina datos dentro de socialProfiles.
+    - Si url y platform son None: Deja el campo socialProfiles vacio ([]).
+    - Si url existe: borra coincidencias de url.
+    - Si platform existe: borra coincidencias de platform.
+    - Si ambos existen: borra coincidencias exactas de url Y platform.
+    """
+    query = {"slug": slug}
+    
+    if url is None and platform is None:
+        # Vaciar el array
+        update = {"$set": {"socialProfiles": []}}
+    else:
+        # Construir filtro para pull
+        pull_filter = {}
+        if url:
+            pull_filter["url"] = url
+        if platform:
+            pull_filter["platform"] = platform
+            
+        update = {"$pull": {"socialProfiles": pull_filter}}
+        
+    result = companies.update_one(query, update)
+    return {"matched": result.matched_count, "modified": result.modified_count}
+
+def delete_social_profiles_field(slug: str) -> Dict[str, int]:
+    """
+    Elimina completamente el campo socialProfiles del documento.
+    """
+    query = {"slug": slug}
+    update = {"$unset": {"socialProfiles": ""}}
+    
+    result = companies.update_one(query, update)
+    return {"matched": result.matched_count, "modified": result.modified_count}
+
+
 ####################
 #INTERNAL UTILITIES#
 ####################
