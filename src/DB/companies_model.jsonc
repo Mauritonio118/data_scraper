@@ -148,12 +148,12 @@
   // =========================================================
   "socialProfiles": [
     {
-      "url": "https://www.linkedin.com/company/realblocks",
-      "platform": "linkedin" // "linkedin" | "twitter" | "facebook" | "instagram" | "youtube" | "telegram" | "discord"
+      "url": "https://linkedin.com/company/realblocks",
+      "platform": "linkedin" // "linkedin" | "X" | "facebook" | "instagram" | "youtube" | "telegram" | "discord"
     },
     {
-      "url": "https://twitter.com/realblocks_io",
-      "platform": "twitter"
+      "url": "https://X.com/realblocks_io",
+      "platform": "X"
     }
   ],
   // =========================================================
