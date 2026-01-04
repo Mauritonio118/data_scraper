@@ -17,7 +17,9 @@ Carpeta `src/`:
 
 - **`scrapers/`**
   - `page_deep_scraper.py`: lógica principal de scraping profundo de páginas.
+  - `thecrowdspace_profile_scraper.py`: scraper específico para perfiles de TheCrowdSpace.
   - `model_builder.py`: convierte la info scrapeada en el **modelo base** que se guarda en la DB.
+  - `SCRAPERS_DOCS.ipynb`: Documentación y ejemplos de uso de los scrapers.
   - `utils/`
     - `requestHTTP.py`: `url → html` (peticiones HTTP con httpx / Playwright).
     - `html_spliter_head_header_main_footer.py`: `html → {head, header, main, footer}`.
@@ -27,8 +29,8 @@ Carpeta `src/`:
     - `text_extractor_from_html.py`: extrae texto relevante desde HTML.
 - **`DB/`**
   - `mongo.py`: conexión con MongoDB (`get_db`, etc.).
-  - `companies_querys.py`: helpers para consultar la colección `companies`
-    (slugs, primaryDomain, dataSources, links, textos, roles, kind, etc.).
+  - `companies_querys.py`: helpers para consultar y modificar la colección `companies`.
+    (slugs, primaryDomain, dataSources, links, textos, roles, kind, socialProfiles, mobileApps, status, etc.).
   - `info_querys.ipynb`: cuaderno demostrativo para probar las queries de `companies_querys.py`.
   - `torpedo_mongo.py`: utilidades extra para operaciones en Mongo.
 - **`analizers/`**
@@ -44,11 +46,17 @@ Carpeta `src/`:
     - `clear_single_datasource_role(slug, datasource_url)`: limpia el role de un dataSource específico.
   - `data_filter.py`: filtros por dominio (redes sociales, app stores, noticias, legal, multimedia, etc.).
   - `model_processor.py`: procesamiento y categorización de links extraídos del scraping.
+  - `social_profile_selector.py`: Lógica para validar, formatear y de-duplicar perfiles sociales.
+  - `store_links_selector.py`: Identificación y gestión de links de tiendas de aplicaciones (App Store, Play Store).
   - `ANALIZERS_DOCS.ipynb`: **Notebook de documentación y ejemplos** del sistema de clasificación.
 - **`workflows/`**
-  - `list_to_scrap_to_model_to_DB.py` / `.ipynb`:
-    workflow end-to-end desde una lista de empresas hasta el modelo en DB.
-  - `companies_list*.csv`: listas de empresas de entrada/salida del proceso.
+  - `workflows_and_more.ipynb`: **Panel de control** para ejecutar workflows interactivamente.
+  - `list_to_scrap_to_model_to_DB.py` / `.ipynb`: Workflow end-to-end.
+  - `process_thecrowdspace_companies.py`: Workflow para scraping de TheCrowdSpace.
+  - `social_profile_finder_workflow.py`: Descubrimiento y guardado de redes sociales.
+  - `store_links_from_datasource_to_db.py`: Extracción de mobile apps desde datasources.
+  - `update_company_operational_status.py`: Actualización de status operacional.
+  - `companies_list*.csv`: listas de empresas de entrada/salida.
 - Otros:
   - `estructura_recomendada.txt`: notas internas sobre estructura del proyecto.
   - `Ian_test.ipynb`, `Mauro_test.ipynb`: notebooks de pruebas exploratorias.
