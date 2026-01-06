@@ -1,6 +1,7 @@
 from src.DB.mongo import get_db
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from urllib.parse import urlparse
+from datetime import datetime, timezone
 
 #Conectar con "companies" dentro de las colecciones de la DB
 db = get_db()
@@ -147,6 +148,117 @@ def get_slugs_not_inactive() -> List[str]:
                 slugs.append(slug2)
 
     return slugs
+
+
+
+####################
+#OPERATIONAL STATUS#
+####################
+
+def manage_operational_status(slug: str, action: str = "get", status: Optional[str] = None, notes: Optional[str] = None) -> Union[Dict[str, Any], None]:
+    """
+    Gestiona el campo operational del documento.
+    
+    action:
+      - "get": retorna el objeto operational (o None si no existe/compañia no existe)
+      - "set" (o "update"): actualiza status y/o notes.
+           * Si el campo no existe, lo crea.
+           * Si los valores son idénticos a los existentes, NO actualiza nada (idempotente).
+           * Solo actualiza updatedAt si hubo cambios reales o es creación.
+           * Soporta partial updates: si status o notes es None, mantiene el valor previo.
+      - "delete" (o "remove", "unset"): elimina el campo operational completo using $unset.
+      
+    Retorno:
+      - get: dict operational o None
+      - set/delete: dict con matched, modified, y opcionalmente message
+    """
+    query = {"slug": slug}
+    action_norm = (action or "").strip().lower()
+
+    # --- GET ---
+    if action_norm == "get":
+        doc = companies.find_one(query, {"_id": 0, "operational": 1})
+        if not doc:
+            return None
+        return doc.get("operational")
+
+    # --- DELETE ---
+    if action_norm in {"delete", "remove", "unset"}:
+        update = {"$unset": {"operational": ""}}
+        res = companies.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    # --- SET / UPDATE ---
+    if action_norm in {"set", "update"}:
+        # 1. Leer estado actual para comparar
+        doc = companies.find_one(query, {"operational": 1})
+        if not doc:
+            # Si la compañia no existe, no podemos hacer update (matched=0)
+            return {"matched": 0, "modified": 0, "message": "Company not found"}
+
+        current_op = doc.get("operational") or {}
+        
+        # 2. Determinar nuevos valores
+        # Si el input es None, mantenemos el valor actual.
+        # Si el current no tiene el field, y el input es None, remains None (pero al crear el objeto, quizas queramos guardar null o no guardar la keys. Segun modelo, son strings opcionales, pero status tiene enum).
+        
+        target_status = status if status is not None else current_op.get("status")
+        target_notes = notes if notes is not None else current_op.get("notes")
+        
+        # 3. Comparar con lo existente
+        # Verificamos igualdad estricta.
+        # Ojo: si current_op vacio (ej. primera vez), y inputs None, target sera None.
+        
+        old_status = current_op.get("status")
+        old_notes = current_op.get("notes")
+
+        # Flag de cambio
+        has_changes = False
+        
+        # Si no existia operational, y ahora vamos a escribir algo, cuenta como cambio (creacion)
+        # PERO si target_status es None y target_notes es None, quizas no queremos crear un operational vacio?
+        # Asumiremos que si se llama a set, se intuye intencion de crear/actualizar datos.
+        # Aunque si status y notes son None, solo se actualizaria updatedAt? Eso podria ser valido "confirmacion de estado".
+        # PERO el requerimiento dice: "Si no se entrega status y/o notes... no hay que modificar... La falta de datos implica que no hay que hacer ningun cambio... no hay que actualizar fecha"
+        
+        if "operational" not in doc:
+            # Creando desde cero
+            has_changes = True
+        else:
+            # Ya existe, comparamos campos
+            if target_status != old_status:
+                has_changes = True
+            if target_notes != old_notes:
+                has_changes = True
+        
+        if not has_changes:
+            return {"matched": 1, "modified": 0, "message": "No changes needed"}
+
+        # 4. Preparar update
+        now_str = datetime.now(timezone.utc).isoformat()
+        
+        # Construimos el objeto operational completo o usamos dot notation?
+        # Dot notation es mas seguro para preservar otros fields si existieran (el modelo no muestra mas, pero por si acaso).
+        # Sin embargo, queremos asegurar que si status es None y antes no existia, no lo escribamos?
+        # Simplificacion: $set de campos individuales.
+        
+        update_fields = {
+            "operational.updatedAt": now_str
+        }
+        if target_status is not None:
+            update_fields["operational.status"] = target_status
+        if target_notes is not None:
+            update_fields["operational.notes"] = target_notes
+
+        # Caso borde: si queriamos borrar status pasando None? 
+        # La funcion dice "si status es None, mantiene el valor previo".
+        # Si quisiéramos borrar un valor especifico, necesitariamos otro mecanismo o asumir string vacio = borrar.
+        # Por ahora nos apegamos a "None = no tocar".
+            
+        res = companies.update_one(query, {"$set": update_fields})
+        return {"matched": res.matched_count, "modified": res.modified_count, "updatedAt": now_str}
+
+    raise ValueError("action no valido. Usa get, set, delete")
 
 
 #################
