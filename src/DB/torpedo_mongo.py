@@ -1,10 +1,10 @@
 """
 mongo_use.py
-Torpedo PyMongo para copiar y pegar usando la colección "companies".
+Torpedo PyMongo para copiar y pegar usando la colección "platforms".
 No está pensado para ejecutarse tal cual.
 
 Idea general:
-- db["companies"] devuelve una Collection
+- db["platforms"] devuelve una Collection
 - En una Collection haces CRUD: insert find update delete
 - Casi todas las operaciones usan un "filter" para elegir qué documentos afectan
 """
@@ -13,11 +13,11 @@ Idea general:
 # CONEXIÓN
 # -----------------------------
 # get_db() devuelve la base seleccionada según APP_ENV en tu .env
-# db["companies"] devuelve la colección "companies"
+# db["platforms"] devuelve la colección "platforms"
 from src.DB.mongo import get_db, ping
 
 db = get_db()
-companies = db["companies"]
+platforms = db["platforms"]
 
 # ping() confirma que el server de Mongo está respondiendo
 ping()
@@ -72,13 +72,13 @@ ping()
 # insert_one(document)
 # - document: dict con el documento a insertar
 # - crea _id automáticamente si no lo incluyes
-companies.insert_one({"slug": "reity", "name": "Reity"})
+platforms.insert_one({"slug": "reity", "name": "Reity"})
 
 # insert_many(documents)
 # - documents: lista de dicts
 # - ordered=True inserta en orden y se detiene si hay error
 # - ordered=False intenta insertar todos aunque alguno falle
-companies.insert_many(
+platforms.insert_many(
     [
         {"slug": "a", "name": "A"},
         {"slug": "b", "name": "B"},
@@ -94,27 +94,27 @@ companies.insert_many(
 # - filter: condiciones para buscar
 # - projection: campos a retornar
 # Retorna: un dict del documento o None
-companies.find_one({"slug": "reity"})
-companies.find_one({"slug": "reity"}, {"_id": 0, "slug": 1, "name": 1})
+platforms.find_one({"slug": "reity"})
+platforms.find_one({"slug": "reity"}, {"_id": 0, "slug": 1, "name": 1})
 
 # find(filter=None, projection=None)
 # - retorna un cursor iterable
-companies.find({"active": True})
-companies.find({"active": True}, {"slug": 1, "name": 1})
+platforms.find({"active": True})
+platforms.find({"active": True}, {"slug": 1, "name": 1})
 
 # sort(field, direction)
 # - field: nombre del campo por el que ordenas
 # - direction: 1 ascendente, -1 descendente
-companies.find({}).sort("updatedAt", -1)
+platforms.find({}).sort("updatedAt", -1)
 
 # skip(n) y limit(n)
 # - skip: salta n documentos
 # - limit: máximo de documentos retornados
-companies.find({}).skip(20).limit(10)
+platforms.find({}).skip(20).limit(10)
 
 # count_documents(filter)
 # - cuenta documentos que matchean el filter
-companies.count_documents({"active": True})
+platforms.count_documents({"active": True})
 
 
 # -----------------------------
@@ -124,37 +124,37 @@ companies.count_documents({"active": True})
 # - filter: qué documento actualizar
 # - update: dict con operadores $set, $inc, etc.
 # - upsert: si True inserta si no existe match
-companies.update_one({"slug": "reity"}, {"$set": {"name": "Reity SpA"}})
+platforms.update_one({"slug": "reity"}, {"$set": {"name": "Reity SpA"}})
 
 # update_many(filter, update, upsert=False)
 # - igual que update_one pero aplica a todos los matches
-companies.update_many({"active": False}, {"$set": {"archived": True}})
+platforms.update_many({"active": False}, {"$set": {"archived": True}})
 
 # Operadores comunes en "update"
 # $set: setea campos
-companies.update_one({"slug": "reity"}, {"$set": {"country": "CL"}})
+platforms.update_one({"slug": "reity"}, {"$set": {"country": "CL"}})
 
 # $unset: elimina campos
-companies.update_one({"slug": "reity"}, {"$unset": {"fieldToRemove": ""}})
+platforms.update_one({"slug": "reity"}, {"$unset": {"fieldToRemove": ""}})
 
 # $inc: incrementa un número
-companies.update_one({"slug": "reity"}, {"$inc": {"visits": 1}})
+platforms.update_one({"slug": "reity"}, {"$inc": {"visits": 1}})
 
 # $push: agrega a un array permitiendo duplicados
-companies.update_one({"slug": "reity"}, {"$push": {"tags": "tokenization"}})
+platforms.update_one({"slug": "reity"}, {"$push": {"tags": "tokenization"}})
 
 # $addToSet: agrega a un array evitando duplicados
-companies.update_one({"slug": "reity"}, {"$addToSet": {"tags": "tokenization"}})
+platforms.update_one({"slug": "reity"}, {"$addToSet": {"tags": "tokenization"}})
 
 # $pull: elimina del array lo que matchee
-companies.update_one({"slug": "reity"}, {"$pull": {"tags": "old"}})
+platforms.update_one({"slug": "reity"}, {"$pull": {"tags": "old"}})
 
 # $currentDate: setea fecha actual en campos
-companies.update_one({"slug": "reity"}, {"$currentDate": {"updatedAt": True}})
+platforms.update_one({"slug": "reity"}, {"$currentDate": {"updatedAt": True}})
 
 # Upsert típico
 # - $setOnInsert solo se aplica cuando se inserta
-companies.update_one(
+platforms.update_one(
     {"slug": "new-company"},
     {"$set": {"name": "New Company"}, "$setOnInsert": {"createdAt": "now"}},
     upsert=True,
@@ -167,7 +167,7 @@ companies.update_one(
 # replace_one(filter, replacement, upsert=False)
 # Reemplaza el documento completo excepto _id
 # Útil cuando tienes un "documento final" y quieres sobrescribir todo
-companies.replace_one(
+platforms.replace_one(
     {"slug": "reity"},
     {"slug": "reity", "name": "Reity Final", "active": True},
     upsert=True,
@@ -180,8 +180,8 @@ companies.replace_one(
 # DELETE elimina documentos
 # delete_one(filter): elimina el primer match
 # delete_many(filter): elimina todos los matches
-companies.delete_one({"slug": "reity"})
-companies.delete_many({"archived": True})
+platforms.delete_one({"slug": "reity"})
+platforms.delete_many({"archived": True})
 
 
 # -----------------------------
@@ -190,11 +190,11 @@ companies.delete_many({"archived": True})
 # Un índice mejora velocidad de búsqueda y puede imponer unicidad
 # create_index("field", unique=True) evita duplicados en ese campo
 # Los índices correctos hacen que find y sort sean mucho más rápidos
-companies.create_index("slug", unique=True)
-companies.create_index([("primaryDomain", 1), ("slug", 1)], unique=True)
+platforms.create_index("slug", unique=True)
+platforms.create_index([("primaryDomain", 1), ("slug", 1)], unique=True)
 
 # list_indexes() lista los índices existentes
-companies.list_indexes()
+platforms.list_indexes()
 
 
 # -----------------------------
@@ -212,7 +212,7 @@ companies.list_indexes()
 # $match filtra como un find pero dentro del pipeline
 # $group agrupa como GROUP BY
 # $sort ordena
-companies.aggregate(
+platforms.aggregate(
     [
         {"$match": {"active": True}},
         {"$group": {"_id": "$country", "count": {"$sum": 1}}},
@@ -232,7 +232,7 @@ companies.aggregate(
 # ordered=False sigue aunque alguna operación falle
 from pymongo import UpdateOne
 
-companies.bulk_write(
+platforms.bulk_write(
     [
         UpdateOne({"slug": "a"}, {"$set": {"name": "A"}}, upsert=True),
         UpdateOne({"slug": "b"}, {"$set": {"name": "B"}}, upsert=True),
@@ -248,4 +248,4 @@ companies.bulk_write(
 # Si tienes el _id como string debes convertirlo a ObjectId para buscar
 from bson import ObjectId
 
-companies.find_one({"_id": ObjectId("6560f0f0f0f0f0f0f0f0f0f0")})
+platforms.find_one({"_id": ObjectId("6560f0f0f0f0f0f0f0f0f0f0")})

@@ -10,7 +10,7 @@ project_root = os.path.abspath(os.path.join(current_dir, '../../'))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from src.DB.companies_querys import companies
+from src.DB.platforms_querys import platforms
 from src.analizers.store_links_selector import analyze_store_links, verify_links_existence, format_store_links_for_model
 
 # Setup logging
@@ -31,7 +31,7 @@ logging.basicConfig(
 def process_store_links():
     logging.info("Starting store links extraction workflow.")
     
-    # 1. Extract slugs of companies that are NO inactive (active or undefined, but specifically not 'inactive')
+    # 1. Extract slugs of platforms that are NO inactive (active or undefined, but specifically not 'inactive')
     # User said: "empresas que NO sean inactivas"
     query = {"operational.status": {"$ne": "inactive"}}
     
@@ -40,10 +40,10 @@ def process_store_links():
     
     try:
         # Get total count for progress tracking
-        total_companies = companies.count_documents(query)
-        cursor = companies.find(query, projection)
+        total_platforms = platforms.count_documents(query)
+        cursor = platforms.find(query, projection)
         
-        logging.info(f"Found {total_companies} companies to process (status != 'inactive').")
+        logging.info(f"Found {total_platforms} platforms to process (status != 'inactive').")
         
         processed_count = 0
         updated_count = 0
@@ -55,7 +55,7 @@ def process_store_links():
             if not slug:
                 continue
             
-            logging.info(f"Processing company: {slug}")
+            logging.info(f"Processing platform: {slug}")
             
             # 2. Find all urls with role: "store_listing"
             store_listing_urls = []
@@ -86,7 +86,7 @@ def process_store_links():
             
             try:
                 if output:
-                    companies.update_one(
+                    platforms.update_one(
                         {"slug": slug}, 
                         {"$set": {"mobileApps": output}}
                     )
@@ -100,7 +100,7 @@ def process_store_links():
 
             processed_count += 1
             if processed_count % 10 == 0:
-                logging.info(f"Progress: {processed_count}/{total_companies}")
+                logging.info(f"Progress: {processed_count}/{total_platforms}")
 
         logging.info("Workflow completed successfully.")
         logging.info(f"Total Processed: {processed_count}")

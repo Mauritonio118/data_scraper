@@ -2,8 +2,8 @@ import os
 import logging
 from datetime import datetime
 from typing import List, Optional
-from src.DB.companies_querys import get_slugs_not_inactive
-from src.analizers.datasource_role_classifier import classify_role_company_datasources, clear_all_company_roles
+from src.DB.platforms_querys import get_slugs_not_inactive
+from src.analizers.datasource_role_classifier import classify_role_platform_datasources, clear_all_platform_roles
 
 # Configuración de logs
 LOG_DIR = os.path.join("logs")
@@ -45,11 +45,11 @@ TARGET_ROLES_TO_CLASSIFY: List[str] = [
 
 def run_classification_workflow():
     """
-    Flujo principal de clasificación de roles para compañías activas.
+    Flujo principal de clasificación de roles para plataformas activas.
     Fase 1: Limpieza de roles específicos.
     Fase 2: Clasificación de roles específicos.
     """
-    logger.info("INICIANDO FLUJO DE GESTIÓN DE ROLES PARA COMPAÑÍAS ACTIVAS")
+    logger.info("INICIANDO FLUJO DE GESTIÓN DE ROLES PARA PLATAFORMAS ACTIVAS")
     logger.info(f"Fecha y Hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     logger.info("="*60)
 
@@ -57,7 +57,7 @@ def run_classification_workflow():
     slugs = get_slugs_not_inactive()
     total_companies = len(slugs)
     
-    logger.info(f"Se encontraron {total_companies} compañías activas (o no inactivas) para procesar.")
+    logger.info(f"Se encontraron {total_companies} plataformas activas (o no inactivas) para procesar.")
     logger.info("="*60 + "\n")
 
     # ==========================================
@@ -72,7 +72,7 @@ def run_classification_workflow():
             logger.info(f"[{i}/{total_companies}] Limpiando roles para: {slug}")
             
             try:
-                result = clear_all_company_roles(slug, target_roles=TARGET_ROLES_TO_CLEAR)
+                result = clear_all_platform_roles(slug, target_roles=TARGET_ROLES_TO_CLEAR)
                 
                 if result.get("error"):
                     logger.error(f"   [ERROR] {result['error']}")
@@ -105,7 +105,7 @@ def run_classification_workflow():
             logger.info(f"[{i}/{total_companies}] Clasificando roles para: {slug}")
             
             try:
-                result = classify_role_company_datasources(slug, target_roles=TARGET_ROLES_TO_CLASSIFY)
+                result = classify_role_platform_datasources(slug, target_roles=TARGET_ROLES_TO_CLASSIFY)
                 
                 if result.get("error"):
                      logger.error(f"   [ERROR] {result['error']}")

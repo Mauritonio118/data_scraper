@@ -4,8 +4,8 @@ Clasifica la URL principal de cada objeto en dataSources y asigna el role corres
 """
 
 from typing import List, Dict, Any, Optional
-from src.DB.companies_querys import (
-    get_company_by_slug,
+from src.DB.platforms_querys import (
+    get_platform_by_slug,
     get_datasource_by_url,
     get_unique_datasource_urls,
     datasource_role
@@ -13,7 +13,7 @@ from src.DB.companies_querys import (
 from src.analizers.role_classifier import classify_url, get_available_roles
 
 
-def classify_role_company_datasources(
+def classify_role_platform_datasources(
     slug: str,
     target_roles: Optional[List[str]] = None
 ) -> Dict[str, Any]:
@@ -37,7 +37,7 @@ def classify_role_company_datasources(
         }
     """
     # Obtener el documento de la compañía
-    doc = get_company_by_slug(
+    doc = get_platform_by_slug(
         slug=slug,
         projection={"_id": 0, "primaryDomain": 1, "dataSources.url": 1, "dataSources.role": 1}
     )
@@ -206,7 +206,7 @@ def get_datasources_by_role(
     Output:
       - Lista de dicts con formato [{"url": "...", "role": "..."}, ...]
     """
-    doc = get_company_by_slug(
+    doc = get_platform_by_slug(
         slug=slug,
         projection={"_id": 0, "dataSources.url": 1, "dataSources.role": 1}
     )
@@ -240,7 +240,7 @@ def get_datasources_by_role(
     return result
 
 
-def clear_all_company_roles(slug: str, target_roles: Optional[List[str]] = None) -> Dict[str, Any]:
+def clear_all_platform_roles(slug: str, target_roles: Optional[List[str]] = None) -> Dict[str, Any]:
     """
     Elimina roles de los dataSources de una compañía.
     Por defecto elimina TODOS los roles. Si se especifica target_roles, solo elimina esos.
@@ -259,7 +259,7 @@ def clear_all_company_roles(slug: str, target_roles: Optional[List[str]] = None)
         }
     """
     # Obtener el documento de la compañía
-    doc = get_company_by_slug(
+    doc = get_platform_by_slug(
         slug=slug,
         projection={"_id": 0, "dataSources.url": 1, "dataSources.role": 1}
     )

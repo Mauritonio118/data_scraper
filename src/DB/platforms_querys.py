@@ -3,15 +3,15 @@ from typing import List, Dict, Any, Optional, Union
 from urllib.parse import urlparse
 from datetime import datetime, timezone
 
-#Conectar con "companies" dentro de las colecciones de la DB
+#Conectar con "platforms" dentro de las colecciones de la DB
 db = get_db()
-companies = db["companies"]
+platforms = db["platforms"]
 
-def get_company_by_slug(slug: str, projection: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+def get_platform_by_slug(slug: str, projection: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
     """
-    Retorna un documento de compañía por su slug.
+    Retorna un documento de plataforma por su slug.
     """
-    return companies.find_one({"slug": slug}, projection)
+    return platforms.find_one({"slug": slug}, projection)
 
 ######
 #SLUG#
@@ -19,7 +19,7 @@ def get_company_by_slug(slug: str, projection: Optional[Dict[str, Any]] = None) 
 
 def get_all_slugs(include_empty: bool = False) -> List[str]:
     """
-    Retorna todos los slugs desde la colección companies.
+    Retorna todos los slugs desde la colección platforms.
     Este resultado puede incluir repetición si existen documentos con el mismo slug.
 
     Parametros
@@ -35,7 +35,7 @@ def get_all_slugs(include_empty: bool = False) -> List[str]:
 
     projection = {"_id": 0, "slug": 1}
 
-    cursor = companies.find(query, projection)
+    cursor = platforms.find(query, projection)
 
     slugs = []
     for doc in cursor:
@@ -67,7 +67,7 @@ def get_unique_slugs(include_empty: bool = False) -> List[str]:
     if not include_empty:
         query = {"slug": {"$exists": True, "$ne": None, "$ne": ""}}
 
-    slugs_unique = companies.distinct("slug", query)
+    slugs_unique = platforms.distinct("slug", query)
 
     out = []
     for s in slugs_unique:
@@ -110,7 +110,7 @@ def get_repeated_slugs(include_empty: bool = False) -> List[Dict[str, Any]]:
         {"$project": {"_id": 0, "slug": "$_id", "count": 1}},
     ]
 
-    result = list(companies.aggregate(pipeline))
+    result = list(platforms.aggregate(pipeline))
 
     if include_empty:
         return result
@@ -128,7 +128,7 @@ def get_repeated_slugs(include_empty: bool = False) -> List[Dict[str, Any]]:
 
 def get_slugs_not_inactive() -> List[str]:
     """
-    Retorna todos los slugs de empresas cuyo operational.status NO es 'inactive'.
+    Retorna todos los slugs de plataformas cuyo operational.status NO es 'inactive'.
     Incluye documentos con status distinto a 'inactive' y documentos donde el campo no existe.
 
     Output
@@ -137,7 +137,7 @@ def get_slugs_not_inactive() -> List[str]:
     query = {"operational.status": {"$ne": "inactive"}}
     projection = {"_id": 0, "slug": 1}
 
-    cursor = companies.find(query, projection)
+    cursor = platforms.find(query, projection)
 
     slugs = []
     for doc in cursor:
@@ -160,7 +160,7 @@ def manage_operational_status(slug: str, action: str = "get", status: Optional[s
     Gestiona el campo operational del documento.
     
     action:
-      - "get": retorna el objeto operational (o None si no existe/compañia no existe)
+      - "get": retorna el objeto operational (o None si no existe/plataforma no existe)
       - "set" (o "update"): actualiza status y/o notes.
            * Si el campo no existe, lo crea.
            * Si los valores son idénticos a los existentes, NO actualiza nada (idempotente).
@@ -177,7 +177,7 @@ def manage_operational_status(slug: str, action: str = "get", status: Optional[s
 
     # --- GET ---
     if action_norm == "get":
-        doc = companies.find_one(query, {"_id": 0, "operational": 1})
+        doc = platforms.find_one(query, {"_id": 0, "operational": 1})
         if not doc:
             return None
         return doc.get("operational")
@@ -185,16 +185,16 @@ def manage_operational_status(slug: str, action: str = "get", status: Optional[s
     # --- DELETE ---
     if action_norm in {"delete", "remove", "unset"}:
         update = {"$unset": {"operational": ""}}
-        res = companies.update_one(query, update)
+        res = platforms.update_one(query, update)
         return {"matched": res.matched_count, "modified": res.modified_count}
 
     # --- SET / UPDATE ---
     if action_norm in {"set", "update"}:
         # 1. Leer estado actual para comparar
-        doc = companies.find_one(query, {"operational": 1})
+        doc = platforms.find_one(query, {"operational": 1})
         if not doc:
-            # Si la compañia no existe, no podemos hacer update (matched=0)
-            return {"matched": 0, "modified": 0, "message": "Company not found"}
+            # Si la plataforma no existe, no podemos hacer update (matched=0)
+            return {"matched": 0, "modified": 0, "message": "Platform not found"}
 
         current_op = doc.get("operational") or {}
         
@@ -255,7 +255,7 @@ def manage_operational_status(slug: str, action: str = "get", status: Optional[s
         # Si quisiéramos borrar un valor especifico, necesitariamos otro mecanismo o asumir string vacio = borrar.
         # Por ahora nos apegamos a "None = no tocar".
             
-        res = companies.update_one(query, {"$set": update_fields})
+        res = platforms.update_one(query, {"$set": update_fields})
         return {"matched": res.matched_count, "modified": res.modified_count, "updatedAt": now_str}
 
     raise ValueError("action no valido. Usa get, set, delete")
@@ -267,7 +267,7 @@ def manage_operational_status(slug: str, action: str = "get", status: Optional[s
 
 def get_all_primary_domains(include_empty: bool = False) -> List[str]:
     """
-    Retorna todos los primaryDomain desde la colección companies.
+    Retorna todos los primaryDomain desde la colección platforms.
     Este resultado puede incluir repetición si existen documentos con el mismo primaryDomain.
     """
     query = {"primaryDomain": {"$exists": True}}
@@ -275,7 +275,7 @@ def get_all_primary_domains(include_empty: bool = False) -> List[str]:
         query = {"primaryDomain": {"$exists": True, "$ne": None, "$ne": ""}}
 
     projection = {"_id": 0, "primaryDomain": 1}
-    cursor = companies.find(query, projection)
+    cursor = platforms.find(query, projection)
 
     out = []
     for doc in cursor:
@@ -298,7 +298,7 @@ def get_unique_primary_domains(include_empty: bool = False) -> List[str]:
     if not include_empty:
         query = {"primaryDomain": {"$exists": True, "$ne": None, "$ne": ""}}
 
-    values = companies.distinct("primaryDomain", query)
+    values = platforms.distinct("primaryDomain", query)
 
     out = []
     for v in values:
@@ -328,7 +328,7 @@ def get_repeated_primary_domains(include_empty: bool = False) -> List[Dict[str, 
         {"$project": {"_id": 0, "primaryDomain": "$_id", "count": 1}},
     ]
 
-    result = list(companies.aggregate(pipeline))
+    result = list(platforms.aggregate(pipeline))
 
     if include_empty:
         return result
@@ -345,6 +345,45 @@ def get_repeated_primary_domains(include_empty: bool = False) -> List[Dict[str, 
     return out
 
 
+def manage_primary_domain(slug: str, action: str = "get", domain: Optional[str] = None) -> Union[str, Dict[str, int], None]:
+    """
+    Gestiona el campo primaryDomain del documento.
+    
+    action:
+      - "get": retorna el primaryDomain actual (str o None)
+      - "set": actualiza primaryDomain al valor entregado.
+      - "delete": elimina el campo primaryDomain (unset).
+      
+    Retorno:
+      - get: str o None
+      - set/delete: dict con matched, modified
+    """
+    query = {"slug": slug}
+    action_norm = (action or "").strip().lower()
+
+    # --- GET ---
+    if action_norm == "get":
+        doc = platforms.find_one(query, {"_id": 0, "primaryDomain": 1})
+        return doc.get("primaryDomain") if doc else None
+
+    # --- DELETE ---
+    if action_norm in {"delete", "remove", "unset"}:
+        update = {"$unset": {"primaryDomain": ""}}
+        res = platforms.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    # --- SET ---
+    if action_norm in {"set", "update"}:
+        if not isinstance(domain, str):
+            raise ValueError("domain debe ser un string para action set")
+            
+        update = {"$set": {"primaryDomain": domain.strip()}}
+        res = platforms.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    raise ValueError("action no valido. Usa get, set, delete")
+
+
 ##############
 #DATA SOURCES#
 ##############
@@ -356,17 +395,17 @@ def get_datasource_by_url(slug: str, datasource_url: str, projection: Optional[D
     """
     if projection is None:
         projection = {"_id": 0, "dataSources.$": 1}
-    return companies.find_one({"slug": slug, "dataSources.url": datasource_url}, projection)
+    return platforms.find_one({"slug": slug, "dataSources.url": datasource_url}, projection)
 
 #URLS
 def get_unique_datasource_urls(slug: str) -> list[str]:
     """
-    Trae todas las urls dentro de dataSources.url para una company identificada por slug.
+    Trae todas las urls dentro de dataSources.url para una plataforma identificada por slug.
     El output es una lista unica sin repeticion.
     """
     """
     Pipeline
-    1) match: selecciona el documento de la company por slug
+    1) match: selecciona el documento de la plataforma por slug
     2) unwind: expande el array dataSources para procesar cada elemento por separado
     3) match: filtra dataSources.url validas (existe, no None, no vacio)
     4) group: agrupa por slug y deduplica urls con addToSet
@@ -384,7 +423,7 @@ def get_unique_datasource_urls(slug: str) -> list[str]:
     Ejecuta el pipeline en MongoDB.
     aggregate retorna una lista con 0 o 1 elementos porque agrupamos por slug.
     """
-    result = list(companies.aggregate(pipeline))
+    result = list(platforms.aggregate(pipeline))
 
     """
     Si existe resultado, retornamos la lista uniqueUrls.
@@ -394,12 +433,12 @@ def get_unique_datasource_urls(slug: str) -> list[str]:
 
 def get_repeated_datasource_urls(slug: str) -> list[dict]:
     """
-    Trae todas las urls repetidas dentro de dataSources.url para una company identificada por slug.
+    Trae todas las urls repetidas dentro de dataSources.url para una plataforma identificada por slug.
     El output incluye cada url repetida junto a su count.
     """
     """
     Pipeline
-    1) match: selecciona el documento de la company por slug
+    1) match: selecciona el documento de la plataforma por slug
     2) unwind: expande el array dataSources para procesar cada elemento por separado
     3) match: filtra dataSources.url validas (existe, no None, no vacio)
     4) group: agrupa por url y cuenta ocurrencias
@@ -421,14 +460,14 @@ def get_repeated_datasource_urls(slug: str) -> list[dict]:
     Ejecuta el pipeline en MongoDB.
     Retorna lista vacia si no hay urls repetidas.
     """
-    return list(companies.aggregate(pipeline))
+    return list(platforms.aggregate(pipeline))
 
-def unique_company_urls_from_primary_domain(slug: str, mode: str = "loose") -> list[str]:
+def unique_platform_urls_from_primary_domain(slug: str, mode: str = "loose") -> list[str]:
     """
-    Busca la company por slug y retorna una lista unica de urls de dataSources.url
+    Busca la plataforma por slug y retorna una lista unica de urls de dataSources.url
     que pertenecen al primaryDomain.
     """
-    doc = companies.find_one(
+    doc = platforms.find_one(
         {"slug": slug},
         {"_id": 0, "primaryDomain": 1, "dataSources.url": 1}
     )
@@ -450,18 +489,18 @@ def unique_company_urls_from_primary_domain(slug: str, mode: str = "loose") -> l
         u = u.strip()
         if not u:
             continue
-        if _belongs_to_company(u, primary_domain, mode=mode):
+        if _belongs_to_platform(u, primary_domain, mode=mode):
             unique.add(u)
 
     return sorted(unique)
 
 #LINKS
-def get_links_from_company_datasource(slug: str, datasource_url: str, sections=None) -> list[str]:
+def get_links_from_platform_datasource(slug: str, datasource_url: str, sections=None) -> list[str]:
     """
-    Trae todos los links de un dataSource especifico dentro de una company.
+    Trae todos los links de un dataSource especifico dentro de una plataforma.
 
     Input:
-      - slug: slug de la company
+      - slug: slug de la plataforma
       - datasource_url: el campo dataSources.url que quieres seleccionar
       - sections: None para head header main y footer
                  "main" para uno solo
@@ -474,7 +513,7 @@ def get_links_from_company_datasource(slug: str, datasource_url: str, sections=N
     if not sections_norm:
         return []
 
-    doc = companies.find_one(
+    doc = platforms.find_one(
         {"slug": slug, "dataSources.url": datasource_url},
         {"_id": 0, "dataSources.$": 1}
     )
@@ -496,12 +535,12 @@ def get_links_from_company_datasource(slug: str, datasource_url: str, sections=N
     return _unique_preserve_order(collected)
 
 #TEXTS
-def get_texts_from_company_datasource(slug: str, datasource_url: str, sections=None, dedupe: bool = True) -> list[str]:
+def get_texts_from_platform_datasource(slug: str, datasource_url: str, sections=None, dedupe: bool = True) -> list[str]:
     """
-    Trae todos los textos de un dataSource especifico dentro de una company.
+    Trae todos los textos de un dataSource especifico dentro de una plataforma.
 
     Input:
-      - slug: slug de la company
+      - slug: slug de la plataforma
       - datasource_url: el campo dataSources.url que quieres seleccionar
       - sections: None para head header main y footer
                  "main" para uno solo
@@ -516,7 +555,7 @@ def get_texts_from_company_datasource(slug: str, datasource_url: str, sections=N
     if not sections_norm:
         return []
 
-    doc = companies.find_one(
+    doc = platforms.find_one(
         {"slug": slug, "dataSources.url": datasource_url},
         {"_id": 0, "dataSources.$": 1}
     )
@@ -558,7 +597,7 @@ def datasource_role(slug: str, datasource_url: str, action: str = "get", role: s
     - "delete": elimina el campo role usando unset
 
     Input
-    - slug: slug de la company
+    - slug: slug de la plataforma
     - datasource_url: valor exacto en dataSources.url
     - action: string con la operacion
     - role: string requerido en set o update
@@ -579,7 +618,7 @@ def datasource_role(slug: str, datasource_url: str, action: str = "get", role: s
         """
         Lee solo el elemento de dataSources que matchea usando projection posicional.
         """
-        doc = companies.find_one(query, {"_id": 0, "dataSources.$": 1})
+        doc = platforms.find_one(query, {"_id": 0, "dataSources.$": 1})
         if not doc:
             return None
 
@@ -598,7 +637,7 @@ def datasource_role(slug: str, datasource_url: str, action: str = "get", role: s
             raise ValueError("role debe ser un string no vacio para action set o update")
 
         update = {"$set": {"dataSources.$.role": role.strip()}}
-        res = companies.update_one(query, update)
+        res = platforms.update_one(query, update)
         return {"matched": res.matched_count, "modified": res.modified_count}
 
     if action_norm in {"delete", "unset", "remove"}:
@@ -606,7 +645,7 @@ def datasource_role(slug: str, datasource_url: str, action: str = "get", role: s
         Elimina el campo role del elemento encontrado.
         """
         update = {"$unset": {"dataSources.$.role": ""}}
-        res = companies.update_one(query, update)
+        res = platforms.update_one(query, update)
         return {"matched": res.matched_count, "modified": res.modified_count}
 
     raise ValueError("action no valido. Usa get, set, update, delete")
@@ -623,7 +662,7 @@ def datasource_kind(slug: str, datasource_url: str, action: str = "get", kind: s
     - "delete": elimina el campo kind usando unset
 
     Input
-    - slug: slug de la company
+    - slug: slug de la plataforma
     - datasource_url: valor exacto en dataSources.url
     - action: string con la operacion
     - kind: string requerido en set o update
@@ -644,7 +683,7 @@ def datasource_kind(slug: str, datasource_url: str, action: str = "get", kind: s
         """
         Lee solo el elemento de dataSources que matchea usando projection posicional.
         """
-        doc = companies.find_one(query, {"_id": 0, "dataSources.$": 1})
+        doc = platforms.find_one(query, {"_id": 0, "dataSources.$": 1})
         if not doc:
             return None
 
@@ -663,7 +702,7 @@ def datasource_kind(slug: str, datasource_url: str, action: str = "get", kind: s
             raise ValueError("kind debe ser un string no vacio para action set o update")
 
         update = {"$set": {"dataSources.$.kind": kind.strip()}}
-        res = companies.update_one(query, update)
+        res = platforms.update_one(query, update)
         return {"matched": res.matched_count, "modified": res.modified_count}
 
     if action_norm in {"delete", "unset", "remove"}:
@@ -671,7 +710,7 @@ def datasource_kind(slug: str, datasource_url: str, action: str = "get", kind: s
         Elimina el campo kind del elemento encontrado.
         """
         update = {"$unset": {"dataSources.$.kind": ""}}
-        res = companies.update_one(query, update)
+        res = platforms.update_one(query, update)
         return {"matched": res.matched_count, "modified": res.modified_count}
 
     raise ValueError("action no valido. Usa get, set, update, delete")
@@ -692,7 +731,7 @@ def upsert_mobile_app(slug: str, url: str, store: str) -> Dict[str, int]:
     query = {"slug": slug, "mobileApps.url": url}
     update = {"$set": {"mobileApps.$.store": store}}
     
-    result = companies.update_one(query, update)
+    result = platforms.update_one(query, update)
     
     if result.matched_count > 0:
         return {"matched": result.matched_count, "modified": result.modified_count}
@@ -704,7 +743,7 @@ def upsert_mobile_app(slug: str, url: str, store: str) -> Dict[str, int]:
     query_push = {"slug": slug}
     update_push = {"$push": {"mobileApps": {"url": url, "store": store}}}
     
-    result_push = companies.update_one(query_push, update_push)
+    result_push = platforms.update_one(query_push, update_push)
     
     return {"matched": result_push.matched_count, "modified": result_push.modified_count}
 
@@ -714,7 +753,7 @@ def get_mobile_apps(slug: str, store: Optional[str] = None) -> List[Dict[str, An
     Opcionalmente filtra por store.
     """
     project = {"_id": 0, "mobileApps": 1}
-    doc = companies.find_one({"slug": slug}, project)
+    doc = platforms.find_one({"slug": slug}, project)
     
     if not doc or "mobileApps" not in doc:
         return []
@@ -751,7 +790,7 @@ def remove_mobile_app(slug: str, url: Optional[str] = None, store: Optional[str]
             
         update = {"$pull": {"mobileApps": pull_filter}}
         
-    result = companies.update_one(query, update)
+    result = platforms.update_one(query, update)
     return {"matched": result.matched_count, "modified": result.modified_count}
 
 def delete_mobile_apps_field(slug: str) -> Dict[str, int]:
@@ -761,7 +800,7 @@ def delete_mobile_apps_field(slug: str) -> Dict[str, int]:
     query = {"slug": slug}
     update = {"$unset": {"mobileApps": ""}}
     
-    result = companies.update_one(query, update)
+    result = platforms.update_one(query, update)
     return {"matched": result.matched_count, "modified": result.modified_count}
 
 
@@ -780,7 +819,7 @@ def upsert_social_profile(slug: str, url: str, platform: str) -> Dict[str, int]:
     query = {"slug": slug, "socialProfiles.url": url}
     update = {"$set": {"socialProfiles.$.platform": platform}}
     
-    result = companies.update_one(query, update)
+    result = platforms.update_one(query, update)
     
     if result.matched_count > 0:
         return {"matched": result.matched_count, "modified": result.modified_count}
@@ -789,7 +828,7 @@ def upsert_social_profile(slug: str, url: str, platform: str) -> Dict[str, int]:
     query_push = {"slug": slug}
     update_push = {"$push": {"socialProfiles": {"url": url, "platform": platform}}}
     
-    result_push = companies.update_one(query_push, update_push)
+    result_push = platforms.update_one(query_push, update_push)
     
     return {"matched": result_push.matched_count, "modified": result_push.modified_count}
 
@@ -799,7 +838,7 @@ def get_social_profiles(slug: str, platform: Optional[str] = None) -> List[Dict[
     Opcionalmente filtra por platform.
     """
     project = {"_id": 0, "socialProfiles": 1}
-    doc = companies.find_one({"slug": slug}, project)
+    doc = platforms.find_one({"slug": slug}, project)
     
     if not doc or "socialProfiles" not in doc:
         return []
@@ -836,7 +875,7 @@ def remove_social_profile(slug: str, url: Optional[str] = None, platform: Option
             
         update = {"$pull": {"socialProfiles": pull_filter}}
         
-    result = companies.update_one(query, update)
+    result = platforms.update_one(query, update)
     return {"matched": result.matched_count, "modified": result.modified_count}
 
 def delete_social_profiles_field(slug: str) -> Dict[str, int]:
@@ -846,7 +885,7 @@ def delete_social_profiles_field(slug: str) -> Dict[str, int]:
     query = {"slug": slug}
     update = {"$unset": {"socialProfiles": ""}}
     
-    result = companies.update_one(query, update)
+    result = platforms.update_one(query, update)
     return {"matched": result.matched_count, "modified": result.modified_count}
 
 
@@ -888,9 +927,9 @@ def _to_host(value: str) -> str:
 
     return host.strip(".")
 
-def _belongs_to_company(url: str, primary_domain: str, mode: str = "loose") -> bool:
+def _belongs_to_platform(url: str, primary_domain: str, mode: str = "loose") -> bool:
     """
-    Valida si una url pertenece a la empresa segun primary_domain.
+    Valida si una url pertenece a la plataforma segun primary_domain.
 
     mode strict:
       - host exacto

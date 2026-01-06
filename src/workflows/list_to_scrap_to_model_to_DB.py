@@ -12,7 +12,7 @@ from src.utils.logger import setup_logger
 
 #Coneccion MongoDB
 db = get_db()
-companiesDB = db["companies"]
+platformsDB = db["platforms"]
 
 #PATH de datos
 HERE = Path(__file__).resolve().parent
@@ -48,7 +48,7 @@ async def main():
             primary_domain = row.Page
             name = row.Nombre
             
-            logger.info(f"[{index}/{total_rows}] Procesando ID: {row.ID} | Compañía: {name} | Page: {primary_domain}")
+            logger.info(f"[{index}/{total_rows}] Procesando ID: {row.ID} | Plataforma: {name} | Page: {primary_domain}")
             
             #Intentar scrapeo
             try:
@@ -62,7 +62,7 @@ async def main():
                     model = await from_url_model(url=url, name=name, primary_domain=primary_domain)
                     
                     #Guardar modelo en DB
-                    companiesDB.insert_one(model)
+                    platformsDB.insert_one(model)
                     logger.info("Modelo guardado exitosamente en Mongo")
 
                     #Ajuste del output
@@ -83,7 +83,7 @@ async def main():
                     model = await from_url_model(url=url, primary_domain=primary_domain)
 
                     #Guardar modelo en DB
-                    companiesDB.insert_one(model)
+                    platformsDB.insert_one(model)
                     logger.info("Modelo guardado exitosamente en Mongo")
 
                     #Ajuste del output
