@@ -345,6 +345,45 @@ def get_repeated_primary_domains(include_empty: bool = False) -> List[Dict[str, 
     return out
 
 
+def manage_primary_domain(slug: str, action: str = "get", domain: Optional[str] = None) -> Union[str, Dict[str, int], None]:
+    """
+    Gestiona el campo primaryDomain del documento.
+    
+    action:
+      - "get": retorna el primaryDomain actual (str o None)
+      - "set": actualiza primaryDomain al valor entregado.
+      - "delete": elimina el campo primaryDomain (unset).
+      
+    Retorno:
+      - get: str o None
+      - set/delete: dict con matched, modified
+    """
+    query = {"slug": slug}
+    action_norm = (action or "").strip().lower()
+
+    # --- GET ---
+    if action_norm == "get":
+        doc = platforms.find_one(query, {"_id": 0, "primaryDomain": 1})
+        return doc.get("primaryDomain") if doc else None
+
+    # --- DELETE ---
+    if action_norm in {"delete", "remove", "unset"}:
+        update = {"$unset": {"primaryDomain": ""}}
+        res = platforms.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    # --- SET ---
+    if action_norm in {"set", "update"}:
+        if not isinstance(domain, str):
+            raise ValueError("domain debe ser un string para action set")
+            
+        update = {"$set": {"primaryDomain": domain.strip()}}
+        res = platforms.update_one(query, update)
+        return {"matched": res.matched_count, "modified": res.modified_count}
+
+    raise ValueError("action no valido. Usa get, set, delete")
+
+
 ##############
 #DATA SOURCES#
 ##############

@@ -113,10 +113,14 @@ def data_to_identity(url=None, name=None, slug=None, primary_domain=None):
 
     # Resolver primaryDomain final
     final_primary = (primary_domain or "").strip().lower()
+    
+    # Si tenemos un input inicial, procesarlo
     if final_primary:
+        # Asegurar protocolo para parsing
         tmp = final_primary
         if "://" not in tmp:
             tmp = "https://" + tmp
+            
         p2 = urlparse(tmp)
         tmp_host = (p2.hostname or final_primary).strip().lower()
         if tmp_host.startswith("www."):
@@ -124,12 +128,19 @@ def data_to_identity(url=None, name=None, slug=None, primary_domain=None):
 
         try:
             ext2 = tldextract.extract(tmp_host)
-            final_primary = (ext2.registered_domain or tmp_host).lower()
+            base_domain = (ext2.registered_domain or tmp_host).lower()
         except Exception:
             parts2 = [p for p in tmp_host.split(".") if p]
-            final_primary = (parts2[-2] + "." + parts2[-1]).lower() if len(parts2) >= 2 else tmp_host
+            base_domain = (parts2[-2] + "." + parts2[-1]).lower() if len(parts2) >= 2 else tmp_host
+            
+        # Asignar con https://
+        final_primary = "https://" + base_domain
     else:
-        final_primary = base_domain
+        # Fallback al dominio base extraido del source url
+        if base_domain:
+            final_primary = "https://" + base_domain
+        else:
+            final_primary = ""
 
     # Resolver slug final
     final_slug = (slug or "").strip().lower()

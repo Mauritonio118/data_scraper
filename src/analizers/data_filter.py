@@ -12,6 +12,11 @@ def _netloc(link):
 def is_in_root_domain(link, root_domain):
     netloc = _netloc(link)
     root_domain = root_domain.lower()
+    
+    # Si root_domain viene con protocolo, extraer solo el host
+    if "://" in root_domain:
+        root_domain = _netloc(root_domain)
+        
     return netloc == root_domain or netloc.endswith("." + root_domain)
 
 
