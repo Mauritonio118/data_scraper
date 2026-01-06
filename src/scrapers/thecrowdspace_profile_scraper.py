@@ -41,7 +41,7 @@ def thecrowdspace_profile_scraper(url: str, html_content: Optional[str] = None) 
         html_content: Optional raw HTML content to parse (avoids HTTP request if provided).
         
     Returns:
-        A dictionary with the extracted data formatted according to the companies_model.
+        A dictionary with the extracted data formatted according to the platforms_model.
     """
     
     if html_content is None:

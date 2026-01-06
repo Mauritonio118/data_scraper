@@ -27,14 +27,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 try:
-    from src.DB.companies_querys import companies
+    from src.DB.platforms_querys import platforms
     from src.scrapers.thecrowdspace_profile_scraper import thecrowdspace_profile_scraper
 except ImportError as e:
     logger.error(f"Error importing modules: {e}")
     logger.error("Please ensure you are running this script from the project root or that the python path is set correctly.")
     sys.exit(1)
 
-def process_companies():
+def process_platforms():
     csv_path = os.path.join(current_dir, 'companies_list.csv')
     
     if not os.path.exists(csv_path):
@@ -50,7 +50,7 @@ def process_companies():
             for row in reader:
                 slug = row.get("Slug")
                 link_thecrowdspace = row.get("Link_Thecrowdspace")
-                company_name = row.get("Nombre", "Unknown")
+                platform_name = row.get("Nombre", "Unknown")
 
                 # Validate essential fields
                 if not slug or not slug.strip():
@@ -59,22 +59,22 @@ def process_companies():
                     continue
                 
                 if not link_thecrowdspace or not link_thecrowdspace.strip():
-                    logger.debug(f"Skipping company '{company_name}' ({slug}) - No Link_Thecrowdspace provided.")
+                    logger.debug(f"Skipping company '{platform_name}' ({slug}) - No Link_Thecrowdspace provided.")
                     continue
 
                 slug = slug.strip()
                 link_thecrowdspace = link_thecrowdspace.strip()
 
-                logger.info(f"Processing company: {company_name} (Slug: {slug})")
+                logger.info(f"Processing company: {platform_name} (Slug: {slug})")
 
                 # 1. Validate existence in MongoDB
-                company_doc = companies.find_one({"slug": slug})
+                platform_doc = platforms.find_one({"slug": slug})
                 
-                if not company_doc:
-                    logger.warning(f"Company with slug '{slug}' not found in MongoDB. Skipping.")
+                if not platform_doc:
+                    logger.warning(f"Platform with slug '{slug}' not found in MongoDB. Skipping.")
                     continue
 
-                logger.info(f"Company '{slug}' found in DB. ID: {company_doc.get('_id')}")
+                logger.info(f"Platform '{slug}' found in DB. ID: {platform_doc.get('_id')}")
 
                 # 2. Construct complete URL
                 # Ensure we don't double protocol if it's already there (though instruction said "agregarle un https://")
@@ -99,7 +99,7 @@ def process_companies():
 
                 # 4. Update MongoDB
                 try:
-                    update_result = companies.update_one(
+                    update_result = platforms.update_one(
                         {"slug": slug},
                         {"$set": {"theCrowdSpace": scraped_data}}
                     )
@@ -107,7 +107,7 @@ def process_companies():
                     if update_result.modified_count > 0:
                         logger.info(f"Successfully updated 'theCrowdSpace' for company '{slug}'.")
                     elif update_result.matched_count > 0:
-                        logger.info(f"Company '{slug}' matched, but no changes needed (content identical).")
+                        logger.info(f"Platform '{slug}' matched, but no changes needed (content identical).")
                     else:
                         logger.warning(f"Could not update company '{slug}' (No match found during update phase).")
                         
@@ -120,4 +120,4 @@ def process_companies():
     logger.info("Workflow execution finished.")
 
 if __name__ == "__main__":
-    process_companies()
+    process_platforms()

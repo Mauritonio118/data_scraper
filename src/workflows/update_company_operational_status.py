@@ -31,11 +31,11 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-def get_companies_collection():
+def get_platforms_collection():
     db = get_db()
-    return db["companies"]
+    return db["platforms"]
 
-def process_company_status(row: Dict[str, str], collection):
+def process_platform_status(row: Dict[str, str], collection):
     company_id = row.get("ID", "Unknown")
     slug = row.get("Slug", "").strip()
     csv_active = row.get("Active", "").strip()
@@ -146,7 +146,7 @@ def main():
         logger.error(f"CSV file not found at {csv_path}")
         return
 
-    collection = get_companies_collection()
+    collection = get_platforms_collection()
     logger.info(f"Starting workflow processing from {csv_path}")
     
     try:
@@ -155,7 +155,7 @@ def main():
             
             count = 0
             for row in reader:
-                process_company_status(row, collection)
+                process_platform_status(row, collection)
                 count += 1
                 
             logger.info(f"Finished processing {count} rows.")

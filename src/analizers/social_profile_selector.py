@@ -3,7 +3,7 @@ import requests
 import logging
 from urllib.parse import urlparse, parse_qs, urlunparse, urlencode
 from typing import List, Dict, Any, Optional, Set
-from src.DB.companies_querys import get_company_by_slug, upsert_social_profile
+from src.DB.platforms_querys import get_platform_by_slug, upsert_social_profile
 
 # Timeout for requests
 TIMEOUT = 10
@@ -138,7 +138,7 @@ def _get_candidates(slug: str) -> List[str]:
     - dataSources (role='official_social_profile')
     - theCrowdSpace -> sidebar -> socials
     """
-    doc = get_company_by_slug(slug, {"dataSources": 1, "theCrowdSpace": 1})
+    doc = get_platform_by_slug(slug, {"dataSources": 1, "theCrowdSpace": 1})
     if not doc:
         return []
         

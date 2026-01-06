@@ -82,7 +82,7 @@ def get_db() -> Database:
     # Devuelve el objeto Database apuntando a la DB del entorno
     # Ejemplo de uso:
     # db = get_db()
-    # companies = db["companies"]
+    # platforms = db["platforms"]
     cfg = load_mongo_config()
     return get_client()[cfg.db_name]
 

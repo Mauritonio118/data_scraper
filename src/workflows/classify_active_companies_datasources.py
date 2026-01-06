@@ -11,7 +11,7 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from src.DB.mongo import get_db
-from src.analizers.datasource_role_classifier import classify_role_company_datasources
+from src.analizers.datasource_role_classifier import classify_role_platform_datasources
 
 # Setup logging
 log_dir = os.path.join(project_root, 'logs')
@@ -42,7 +42,7 @@ def process_active_companies(target_roles: Optional[List[str]] = None):
 
     try:
         db = get_db()
-        companies_collection = db["companies"]
+        platforms_collection = db["platforms"]
         
         # Query: operational.status != "inactive"
         # Note: This includes cases where operational field doesn't exist, or status is null, etc.
@@ -52,11 +52,11 @@ def process_active_companies(target_roles: Optional[List[str]] = None):
         # We only need the slug to call the classifier
         projection = {"slug": 1, "name": 1, "_id": 1}
         
-        cursor = companies_collection.find(query, projection)
+        cursor = platforms_collection.find(query, projection)
         companies_list = list(cursor)
         
         total_companies = len(companies_list)
-        logger.info(f"Found {total_companies} companies to process.")
+        logger.info(f"Found {total_companies} platforms to process.")
         
         stats_summary = {
             "processed_companies": 0,
@@ -69,14 +69,14 @@ def process_active_companies(target_roles: Optional[List[str]] = None):
             name = company.get("name", "Unknown")
             
             if not slug:
-                logger.warning(f"Skipping company ID {company.get('_id')} - No slug found.")
+                logger.warning(f"Skipping platform ID {company.get('_id')} - No slug found.")
                 continue
             
             logger.info(f"[{i}/{total_companies}] Processing '{name}' (slug: {slug})...")
             
             try:
                 # Call the classifier
-                result = classify_role_company_datasources(slug=slug, target_roles=target_roles)
+                result = classify_role_platform_datasources(slug=slug, target_roles=target_roles)
                 
                 if result.get("error"):
                     logger.warning(f"[{slug}] Result error: {result.get('error')}")
@@ -94,7 +94,7 @@ def process_active_companies(target_roles: Optional[List[str]] = None):
                 stats_summary["processed_companies"] += 1
                 
             except Exception as e:
-                logger.error(f"Error classifying company '{slug}': {e}", exc_info=True)
+                logger.error(f"Error classifying platform '{slug}': {e}", exc_info=True)
                 stats_summary["errors"] += 1
                 
         logger.info("Classification process finished.")

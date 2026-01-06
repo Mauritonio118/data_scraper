@@ -3,7 +3,7 @@ import requests
 from urllib.parse import urlparse, parse_qs, urlunparse, quote
 from typing import List, Dict, Optional, Set
 from src.analizers.datasource_role_classifier import get_datasources_by_role
-from src.DB.companies_querys import upsert_mobile_app
+from src.DB.platforms_querys import upsert_mobile_app
 
 # Timeout settings for requests
 TIMEOUT = 10

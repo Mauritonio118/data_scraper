@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 from datetime import datetime
-from src.DB.companies_querys import get_slugs_not_inactive, delete_social_profiles_field
+from src.DB.platforms_querys import get_slugs_not_inactive, delete_social_profiles_field
 from src.analizers.social_profile_selector import analyze_and_store_social_profiles
 
 # Configuration
@@ -51,12 +51,12 @@ def run_workflow():
         # 1. Get Slugs
         logger.info("Fetching active company slugs...")
         slugs = get_slugs_not_inactive()
-        logger.info(f"Found {len(slugs)} companies to process.")
+        logger.info(f"Found {len(slugs)} platforms to process.")
         
         # 1.5. Reset Mode
         if RESET_ALL_PROFILES:
             logger.info("!" * 60)
-            logger.info("RESET MODE ENABLED: DELETING 'socialProfiles' FIELD FROM ALL COMPANIES")
+            logger.info("RESET MODE ENABLED: DELETING 'socialProfiles' FIELD FROM ALL PLATFORMS")
             logger.info("!" * 60)
             for slug in slugs:
                 res = delete_social_profiles_field(slug)
@@ -92,7 +92,7 @@ def run_workflow():
             
         logger.info("=" * 60)
         logger.info(f"WORKFLOW COMPLETED")
-        logger.info(f"Total Companies Processed: {total_processed}")
+        logger.info(f"Total Platforms Processed: {total_processed}")
         logger.info(f"Total Profiles Stored/Updated: {total_stored}")
         logger.info(f"Logs saved to: {os.path.abspath(LOG_FILE)}")
         logger.info("=" * 60)
