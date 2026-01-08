@@ -889,6 +889,67 @@ def delete_social_profiles_field(slug: str) -> Dict[str, int]:
     return {"matched": result.matched_count, "modified": result.modified_count}
 
 
+#############
+#PAGE ROUTES#
+#############
+
+def upsert_page_routes(slug: str, projects_route: Optional[List[str]] = None, projects_prefixes: Optional[List[str]] = None, favicon_route: Optional[str] = None) -> Dict[str, Union[int, str]]:
+    """
+    Agrega o actualiza el objeto pageRoutes.
+    Permite actualizaciones parciales si se pasan argumentos.
+    Siempre actualiza 'updatedAt'.
+    """
+    query = {"slug": slug}
+    
+    # Validar existencia plataforma (opcional pero consistente con otras funcs status)
+    # Pero para eficiencia podemos intentar update directo.
+    # Siguiendo estilo manage_operational_status:
+    
+    doc = platforms.find_one(query, {"_id": 1})
+    if not doc:
+        return {"matched": 0, "modified": 0, "message": "Platform not found"}
+    
+    update_fields = {}
+    
+    if projects_route is not None:
+        update_fields["pageRoutes.projectsRoute"] = projects_route
+        
+    if projects_prefixes is not None:
+        update_fields["pageRoutes.projectsPrefixes"] = projects_prefixes
+        
+    if favicon_route is not None:
+        update_fields["pageRoutes.faviconRoute"] = favicon_route
+        
+    # Si no hay nada que actualizar, retornamos (pero podriamos actualizar solo el timestamp si se llama explicitamente?)
+    # Asumamos que si se llama es para tocar algo. Si todos son None, no hacemos nada.
+    if not update_fields:
+        return {"matched": 1, "modified": 0, "message": "No changes provided"}
+        
+    now_str = datetime.now(timezone.utc).isoformat()
+    update_fields["pageRoutes.updatedAt"] = now_str
+    
+    res = platforms.update_one(query, {"$set": update_fields})
+    return {"matched": res.matched_count, "modified": res.modified_count, "updatedAt": now_str}
+
+def get_page_routes(slug: str) -> Optional[Dict[str, Any]]:
+    """
+    Retorna el objeto pageRoutes completo para un slug.
+    """
+    doc = platforms.find_one({"slug": slug}, {"_id": 0, "pageRoutes": 1})
+    if not doc:
+        return None
+    return doc.get("pageRoutes")
+
+def delete_page_routes(slug: str) -> Dict[str, int]:
+    """
+    Elimina (unset) el campo pageRoutes completamente.
+    """
+    query = {"slug": slug}
+    update = {"$unset": {"pageRoutes": ""}}
+    res = platforms.update_one(query, update)
+    return {"matched": res.matched_count, "modified": res.modified_count}
+
+
 ####################
 #INTERNAL UTILITIES#
 ####################
