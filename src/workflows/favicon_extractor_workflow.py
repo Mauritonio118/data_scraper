@@ -14,7 +14,9 @@ from src.DB.platforms_querys import get_slugs_not_inactive, manage_primary_domai
 from src.scrapers.favicon_scraper import get_favicon_url
 
 # Configurar Logging
-log_filename = "favicon_workflow.log"
+log_dir = os.path.join(src_path, "logs")
+os.makedirs(log_dir, exist_ok=True)
+log_filename = os.path.join(log_dir, "favicon_workflow.log")
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -35,17 +37,19 @@ def process_favicons():
     fail_count = 0
     skip_count = 0
     
-    for slug in slugs:
+    total_slugs = len(slugs)
+
+    for i, slug in enumerate(slugs, 1):
         try:
             # 2. Obtener Primary Domain
             primary_domain = manage_primary_domain(slug, action="get")
             
             if not primary_domain:
-                logging.warning(f"SKIP [{slug}]: No tiene primaryDomain.")
+                logging.warning(f"[{i}/{total_slugs}] SKIP [{slug}]: No tiene primaryDomain.")
                 skip_count += 1
                 continue
                 
-            logging.info(f"PROCESANDO [{slug}]: Dominio -> {primary_domain}")
+            logging.info(f"[{i}/{total_slugs}] PROCESANDO [{slug}]: Dominio -> {primary_domain}")
             
             # 3. Scraper Favicon
             try:
@@ -55,12 +59,15 @@ def process_favicons():
                 # 4. Guardar en DB
                 res = upsert_page_routes(slug, favicon_route=favicon_url)
                 
+                # Filtrar updatedAt para logs
+                res_log = {k: v for k, v in res.items() if k != 'updatedAt'}
+                
                 if res.get("modified", 0) > 0:
-                    logging.info(f"  --> DB Actualizada: {res}")
+                    logging.info(f"  --> DB Actualizada: {res_log}")
                 elif res.get("matched", 0) > 0:
-                    logging.info(f"  --> DB Sin cambios (ya existía): {res}")
+                    logging.info(f"  --> DB Sin cambios (ya existía): {res_log}")
                 else:
-                    logging.error(f"  --> Error al guardar en DB: {res}")
+                    logging.error(f"  --> Error al guardar en DB: {res_log}")
                 
                 success_count += 1
                 
