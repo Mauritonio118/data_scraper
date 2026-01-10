@@ -4,7 +4,7 @@ Pipeline para pasar de **internet → datos crudos → modelo base en MongoDB �
 
 Incluye:
 - **Scrapers** HTTP/Playwright para extraer HTML, links y textos.
-- **Utilidades** para limpiar y normalizar URLs y contenido.
+- **Utilidades** Normalización de imágenes a PNG (Pillow + Playwright para SVGs).
 - **Módulos de DB** para leer/escribir en MongoDB.
 - **Analizers** para clasificar URLs por role y filtrar/depurar la data.
 - **Workflows** de extremo a extremo (lista de empresas → scraping → modelo → DB).
@@ -79,6 +79,7 @@ Las dependencias principales están en `requirements.txt`:
 - **Scraping avanzado**: `playwright`
 - **DB / Data**: `pymongo`, `pandas`
 - **Config**: `python-dotenv`
+- **Image Processing**: `Pillow`
 
 ### Instalación automatizada (recomendado)
 

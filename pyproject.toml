@@ -18,7 +18,8 @@ dependencies = [
     "pymongo",
     "pandas",
     "python-dotenv",
-    "nbstripout"
+    "nbstripout",
+    "Pillow"
 ]
 requires-python = ">=3.7"
 
