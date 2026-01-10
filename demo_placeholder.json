@@ -1,0 +1,372 @@
+{
+    "slug": "demo",
+    "name": "DemoPlatform",
+    "primaryDomain": "demo-platform.com",
+    "description": "This is a demo entry simulating a real estate tokenization company. It serves as an ideal example of complete data to showcase the UI and visualization capabilities of the platform. All data herein is for illustrative purposes only.",
+    "foundedAt": "2018-04-12T00:00:00Z",
+    "operational": {
+        "status": "active",
+        "updatedAt": "2025-01-10T00:00:00Z",
+        "notes": "Operational status simulated for demo purposes."
+    },
+    "classifications": {
+        "productType": [
+            "marketplace"
+        ],
+        "businessModel": [
+            "b2b"
+        ],
+        "targetInvestors": [
+            "institutional",
+            "accredited"
+        ],
+        "assetFocus": [
+            "real_estate"
+        ],
+        "categories": [
+            "tokenized_real_estate",
+            "marketplace"
+        ],
+        "tags": [
+            "real_estate_tokenization",
+            "institutional_focus",
+            "usa",
+            "europe",
+            "b2b"
+        ]
+    },
+    "geography": {
+        "hq": {
+            "country": "United States",
+            "city": "New York",
+            "address": "500 5th Avenue, New York, NY 10110"
+        },
+        "offices": [
+            {
+                "country": "United Kingdom",
+                "city": "London",
+                "address": "10 Demo Street, London"
+            }
+        ],
+        "operatingCountries": [
+            "United States",
+            "United Kingdom",
+            "Spain",
+            "Chile"
+        ]
+    },
+    "compliance": {
+        "kycRequired": true,
+        "accreditationRequired": true,
+        "regulation": {
+            "scopes": [
+                "investment_firm",
+                "crowdfunding"
+            ],
+            "regulators": [
+                "FCA"
+            ],
+            "licenses": [
+                {
+                    "jurisdiction": "United Kingdom",
+                    "regulatorName": "FCA",
+                    "licenseNumber": "FRN 123456",
+                    "status": "active",
+                    "licenseType": null,
+                    "scopes": [
+                        "investment_firm",
+                        "crowdfunding"
+                    ]
+                }
+            ]
+        }
+    },
+    "tech": {
+        "isOnChain": true,
+        "chains": [
+            {
+                "name": "Ethereum",
+                "network": "mainnet",
+                "chainId": 1
+            },
+            {
+                "name": "Polygon",
+                "network": "mainnet",
+                "chainId": 137
+            }
+        ],
+        "tokenStandards": [
+            "ERC20",
+            "ERC1400"
+        ],
+        "techStack": [
+            "erc20",
+            "erc1400"
+        ],
+        "supportsFractionalOwnership": true,
+        "supportsSecondaryMarket": true
+    },
+    "pageRoutes": {
+        "projectsRoute": [
+            "https://example.com/projects"
+        ],
+        "projectsPrefixes": [
+            "/project"
+        ],
+        "faviconRoute": "https://www.gstatic.com/images/branding/searchlogo/ico/favicon.ico",
+        "updatedAt": "2025-01-10T00:00:00Z"
+    },
+    "mobileApps": [
+        {
+            "url": "https://play.google.com",
+            "store": "google_play"
+        },
+        {
+            "url": "https://apps.apple.com",
+            "store": "apple_store"
+        }
+    ],
+    "socialProfiles": [
+        {
+            "url": "https://linkedin.com",
+            "platform": "linkedin"
+        },
+        {
+            "url": "https://x.com",
+            "platform": "X"
+        }
+    ],
+    "legal": {
+        "legalName": "DemoPlatform Ltd",
+        "legalForm": "Ltd",
+        "registrationNumber": "12345678",
+        "registrationCountry": "United Kingdom",
+        "registeredAddress": "10 Demo Street, London"
+    },
+    "dataSources": [
+        {
+            "role": "official_site",
+            "kind": "website",
+            "url": "https://example.com",
+            "links": {
+                "head": [
+                    "https://example.com/about",
+                    "https://example.com/team"
+                ],
+                "header": [
+                    "https://example.com/login",
+                    "https://example.com/register"
+                ],
+                "main": [
+                    "https://example.com/projects",
+                    "https://example.com/invest"
+                ],
+                "footer": [
+                    "https://example.com/privacy",
+                    "https://example.com/terms"
+                ]
+            },
+            "texts": {
+                "head": [
+                    "About Us",
+                    "Our Team"
+                ],
+                "header": [
+                    "Login",
+                    "Register"
+                ],
+                "main": [
+                    "View Projects",
+                    "Start Investing"
+                ],
+                "footer": [
+                    "Privacy Policy",
+                    "Terms of Service"
+                ]
+            },
+            "meta": {
+                "lastCheckedAt": "2025-01-09T00:00:00Z"
+            }
+        },
+        {
+            "role": "social_profile",
+            "kind": "linkedin",
+            "url": "https://linkedin.com",
+            "links": {},
+            "texts": {},
+            "meta": {
+                "platform": "linkedin",
+                "lastCheckedAt": "2025-01-09T00:00:00Z"
+            }
+        },
+        {
+            "role": "social_profile",
+            "kind": "twitter",
+            "url": "https://twitter.com",
+            "links": {},
+            "texts": {},
+            "meta": {
+                "platform": "twitter",
+                "lastCheckedAt": "2025-01-09T00:00:00Z"
+            }
+        },
+        {
+            "role": "rating",
+            "kind": "trustpilot",
+            "url": "https://trustpilot.com",
+            "links": {},
+            "texts": {},
+            "meta": {
+                "rating": 4.5,
+                "reviewsCount": 120,
+                "lastCheckedAt": "2025-01-08T00:00:00Z"
+            }
+        },
+        {
+            "role": "directory_profile",
+            "kind": "crunchbase",
+            "url": "https://crunchbase.com",
+            "links": {},
+            "texts": {},
+            "meta": {
+                "lastCheckedAt": "2025-01-08T00:00:00Z"
+            }
+        },
+        {
+            "role": "regulator_profile",
+            "kind": "regulator",
+            "url": "https://fca.org.uk",
+            "links": {},
+            "texts": {},
+            "meta": {
+                "regulatorName": "FCA",
+                "licenseNumber": "FRN 123456",
+                "jurisdictionCountry": "United Kingdom",
+                "lastCheckedAt": "2025-01-08T00:00:00Z"
+            }
+        },
+        {
+            "role": "store_listing",
+            "kind": "play_store",
+            "url": "https://play.google.com",
+            "links": {},
+            "texts": {},
+            "meta": {
+                "platform": "android",
+                "rating": 4.5,
+                "reviewsCount": 320,
+                "lastCheckedAt": "2025-01-07T00:00:00Z"
+            }
+        },
+        {
+            "role": "store_listing",
+            "kind": "app_store",
+            "url": "https://apps.apple.com",
+            "links": {},
+            "texts": {},
+            "meta": {
+                "platform": "ios",
+                "rating": 4.6,
+                "reviewsCount": 210,
+                "lastCheckedAt": "2025-01-07T00:00:00Z"
+            }
+        }
+    ],
+    "theCrowdSpace": {
+        "theCrowdSpaceUrl": "https://thecrowdspace.com",
+        "lastScrapedAt": "2025-12-27T18:31:08Z",
+        "hero": {
+            "logoUrls": [
+                "https://example.com/logo.png"
+            ],
+            "ecspLicense": true,
+            "isVerified": true,
+            "description": "A description of the company from The Crowd Space.",
+            "industries": [
+                "Real Estate",
+                "Tokenization"
+            ]
+        },
+        "content": {
+            "topCards": [
+                {
+                    "title": "Minimum investment",
+                    "value": "1000 USD"
+                },
+                {
+                    "title": "Advertised return",
+                    "value": "10.00%"
+                }
+            ],
+            "descriptions": [
+                {
+                    "title": "What does DemoPlatform offer?",
+                    "text": "This platform simulates a high-end real estate investment marketplace."
+                }
+            ]
+        },
+        "sidebar": {
+            "stats": {
+                "Year founded": "2018",
+                "Investment type": [
+                    "Equity"
+                ],
+                "License number": "12345678",
+                "Languages": [
+                    "English",
+                    "Spanish"
+                ],
+                "Registration": "United States",
+                "Headquarters": "United States"
+            },
+            "operatesIn": {
+                "region": "Global",
+                "countries": [
+                    "United States",
+                    "United Kingdom",
+                    "Spain",
+                    "Chile"
+                ]
+            },
+            "trustpilot": {
+                "url": "https://trustpilot.com"
+            },
+            "socials": [
+                "https://facebook.com",
+                "https://twitter.com"
+            ],
+            "status": "active",
+            "websiteUrl": "https://example.com",
+            "features": [
+                {
+                    "name": "Regulated",
+                    "available": true
+                },
+                {
+                    "name": "Secondary Market",
+                    "available": true
+                },
+                {
+                    "name": "Public statistics",
+                    "available": true,
+                    "metaUrl": "https://example.com/stats"
+                }
+            ]
+        },
+        "p2p": {
+            "sneakypeerScoring": "15.0",
+            "transparency": "95%",
+            "redFlags": []
+        },
+        "team": [
+            {
+                "name": "Jane Doe",
+                "position": "CEO"
+            }
+        ]
+    },
+    "meta": {
+        "createdAt": "2025-01-09T00:00:00Z",
+        "updatedAt": "2025-01-10T00:00:00Z"
+    }
+}
